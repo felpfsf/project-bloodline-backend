@@ -35,4 +35,9 @@ public sealed class UserRepository(BloodlineDbContext dbContext) : IUserReposito
   {
     return _dbContext.Users.AnyAsync(user => user.NormalizedEmail == normalizedEmail, cancellationToken);
   }
+
+  public Task<User?> GetByNormalizedEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+  {
+    return _dbContext.Users.AsNoTracking().SingleOrDefaultAsync(user => user.NormalizedEmail == normalizedEmail, cancellationToken);
+  }
 }
