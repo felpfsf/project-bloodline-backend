@@ -1,0 +1,48 @@
+## Build output
+bin/
+obj/
+TestResults/
+
+## User-specific IDE files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider
+_ReSharper*/
+*.DotSettings.user
+
+## Logs and diagnostics
+*.log
+logs/
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Environment and local secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+
+## NuGet
+*.nupkg
+packages/
+
+## Coverage
+coverage/
+coverage.xml
+*.coverage
+*.coveragexml
+
+## Temporary files
+*.tmp
+*.temp
+*.swp
+*.bak
