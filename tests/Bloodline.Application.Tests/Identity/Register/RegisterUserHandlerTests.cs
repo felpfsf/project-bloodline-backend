@@ -1,5 +1,5 @@
 using Bloodline.Application.Identity.Register;
-using Bloodline.Application.Tests.Identity.Register.Fakes;
+using Bloodline.Application.Tests.Identity.Fakes;
 
 namespace Bloodline.Application.Tests.Identity.Register;
 
