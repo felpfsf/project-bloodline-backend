@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Bloodline.Api/Bloodline.Api.csproj" />
+    <Project Path="src/Bloodline.Application/Bloodline.Application.csproj" />
+    <Project Path="src/Bloodline.Domain/Bloodline.Domain.csproj" />
+    <Project Path="src/Bloodline.Infrastructure/Bloodline.Infrastructure.csproj" />
+    <Project Path="src/Bloodline.Worker/Bloodline.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Bloodline.Api.Tests/Bloodline.Api.Tests.csproj" />
+    <Project Path="tests/Bloodline.Application.Tests/Bloodline.Application.Tests.csproj" />
+    <Project Path="tests/Bloodline.Domain.Tests/Bloodline.Domain.Tests.csproj" />
+    <Project Path="tests/Bloodline.Infrastructure.Tests/Bloodline.Infrastructure.Tests.csproj" />
+    <Project Path="tests/Bloodline.Worker.Tests/Bloodline.Worker.Tests.csproj" />
+  </Folder>
+</Solution>

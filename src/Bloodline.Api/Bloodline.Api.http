@@ -1,0 +1,6 @@
+@Bloodline.Api_HostAddress = http://localhost:5226
+
+GET {{Bloodline.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
