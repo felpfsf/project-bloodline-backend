@@ -2,13 +2,15 @@ using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Identity.Abstractions;
 using Bloodline.Domain.Identity;
 
-namespace Bloodline.Application.Tests.Identity.Register.Fakes;
+namespace Bloodline.Application.Tests.Identity.Fakes;
 
 internal sealed class FakeUserRepository : IUserRepository
 {
   public bool UserExists { get; set; }
   public bool ThrowUniqueConstraintViolationException { get; set; }
+  public User? UserToReturn { get; set; }
   public string? CheckedNormalizedEmail { get; private set; }
+  public string? RequestedNormalizedEmail { get; set; }
   public User? CreatedUser { get; private set; }
 
   public Task<bool> ExistsByNormalizedEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
@@ -31,5 +33,12 @@ internal sealed class FakeUserRepository : IUserRepository
     CreatedUser = user;
 
     return Task.CompletedTask;
+  }
+
+  public Task<User?> GetByNormalizedEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+  {
+    RequestedNormalizedEmail = normalizedEmail;
+
+    return Task.FromResult(UserToReturn);
   }
 }

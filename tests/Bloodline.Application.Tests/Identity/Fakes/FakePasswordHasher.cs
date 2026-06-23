@@ -1,6 +1,6 @@
 using Bloodline.Application.Identity.Abstractions;
 
-namespace Bloodline.Application.Tests.Identity.Register.Fakes;
+namespace Bloodline.Application.Tests.Identity.Fakes;
 
 internal sealed class FakePasswordHasher : IPasswordHasher
 {
