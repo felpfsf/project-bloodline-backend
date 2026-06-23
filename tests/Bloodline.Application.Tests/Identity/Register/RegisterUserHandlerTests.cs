@@ -148,4 +148,35 @@ public sealed class RegisterUserHandlerTests
     Assert.Null(repository.CreatedUser);
     Assert.Null(passwordHasher.ReceivedPassword);
   }
+
+  [Fact]
+  public async Task HandleAsync_ShouldReturnEmailAlreadyExists_WhenUniqueConstraintViolationOccurs()
+  {
+    // Arrange
+    var repository = new FakeUserRepository
+    {
+      UserExists = false,
+      ThrowUniqueConstraintViolationException = true
+    };
+
+    var passwordHasher = new FakePasswordHasher();
+
+    var clock = new FakeClock
+    {
+      UtcNow = new DateTimeOffset(2026, 6, 22, 21, 0, 0, TimeSpan.Zero)
+    };
+
+    var handler = CreateHandler(repository, passwordHasher, clock);
+
+    var command = new RegisterUserCommand(fakeEmail, fakePassword);
+
+    // Act
+    var result = await handler.HandleAsync(command, CancellationToken.None);
+
+    // Assert
+    Assert.False(result.IsSuccess);
+    Assert.Equal(RegisterUserError.EmailAlreadyExists, result.Error);
+
+
+  }
 }

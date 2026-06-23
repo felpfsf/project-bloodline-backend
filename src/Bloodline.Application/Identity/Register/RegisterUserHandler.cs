@@ -1,4 +1,5 @@
 
+using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Common.Time;
 using Bloodline.Application.Common.Validation;
 using Bloodline.Application.Identity.Abstractions;
@@ -66,7 +67,15 @@ public sealed class RegisterUserHandler
       _clock.UtcNow
     );
 
-    await _userRepository.CreateAsync(user, cancellationToken);
+    try
+    {
+      await _userRepository.CreateAsync(user, cancellationToken);
+    }
+    catch (UniqueConstraintViolationException exception)
+      when (exception.ConstraintName == "ux_users_normalized_email")
+    {
+      return RegisterUserResult.Failure(RegisterUserError.EmailAlreadyExists);
+    }
 
     return RegisterUserResult.Success(
       user.Id,
