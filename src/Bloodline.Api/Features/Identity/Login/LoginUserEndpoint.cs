@@ -42,8 +42,8 @@ public static class LoginUserEndpoint
     }
 
     var response = new LoginResponse(
-      result.UserId!.Value,
-      result.Email!
+      result.AccessToken!.Value,
+      result.AccessToken!.ExpiresAtUtc
     );
 
     return Results.Ok(response);

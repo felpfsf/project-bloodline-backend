@@ -4,22 +4,17 @@ using FluentValidation;
 
 namespace Bloodline.Application.Identity.Login;
 
-public sealed class LoginUserHandler
-{
-  private readonly IUserRepository _userRepository;
-  private readonly IPasswordHasher _passwordHasher;
-  private readonly IValidator<LoginCommand> _validator;
-
-  public LoginUserHandler(
-    IUserRepository userRepository,
-    IPasswordHasher passwordHasher,
-    IValidator<LoginCommand> validator
+public sealed class LoginUserHandler(
+  IUserRepository userRepository,
+  IPasswordHasher passwordHasher,
+  ITokenService tokenService,
+  IValidator<LoginCommand> validator
   )
-  {
-    _userRepository = userRepository;
-    _passwordHasher = passwordHasher;
-    _validator = validator;
-  }
+{
+  private readonly IUserRepository _userRepository = userRepository;
+  private readonly IPasswordHasher _passwordHasher = passwordHasher;
+  private readonly ITokenService _tokenService = tokenService;
+  private readonly IValidator<LoginCommand> _validator = validator;
 
   public async Task<LoginUserResult> HandleAsync(LoginCommand command, CancellationToken cancellationToken)
   {
@@ -54,6 +49,8 @@ public sealed class LoginUserHandler
       return LoginUserResult.Failure(LoginUserError.InvalidCredentials);
     }
 
-  return LoginUserResult.Success(user.Id, user.Email);
+    var accessToken = _tokenService.Generate(user.Id);
+
+    return LoginUserResult.Success(user.Id, user.Email, accessToken);
   }
 }
