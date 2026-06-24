@@ -10,8 +10,9 @@ public sealed class LoginUserHandlerTests
   private const string fakePassword = "password123";
   private const string fakeNormalizedEmail = "TEST@EXAMPLE.COM";
   private const string fakeHashedPassword = "hashed-password";
+  private readonly FakeTokenService tokenService = new();
 
-  private static LoginUserHandler LoginHandler(
+  private LoginUserHandler LoginHandler(
     FakeUserRepository repository,
     FakePasswordHasher passwordHasher
   )
@@ -19,6 +20,7 @@ public sealed class LoginUserHandlerTests
     return new LoginUserHandler(
       repository,
       passwordHasher,
+      tokenService,
       new LoginUserCommandValidator()
     );
   }
@@ -46,6 +48,9 @@ public sealed class LoginUserHandlerTests
     Assert.True(result.IsSuccess);
     Assert.Equal(user.Id, result.UserId);
     Assert.Equal(user.Email, result.Email);
+    Assert.Equal(user.Id, tokenService.ReceivedUserId);
+    Assert.NotNull(result.AccessToken);
+    Assert.Equal("fake-access-token", result.AccessToken!.Value);
 
     Assert.Equal(fakeNormalizedEmail, repository.RequestedNormalizedEmail);
     Assert.Equal(fakeHashedPassword, passwordHasher.ReceivedHashedPassword);
@@ -70,6 +75,8 @@ public sealed class LoginUserHandlerTests
     Assert.False(result.IsSuccess);
     Assert.Equal(LoginUserError.InvalidCredentials, result.Error);
     Assert.Null(passwordHasher.ReceivedProvidedPassword);
+    Assert.Null(tokenService.ReceivedUserId);
+    Assert.Null(result.AccessToken);
   }
 
   [Fact]
@@ -94,6 +101,8 @@ public sealed class LoginUserHandlerTests
     // Assert
     Assert.False(result.IsSuccess);
     Assert.Equal(LoginUserError.InvalidCredentials, result.Error);
+    Assert.Null(tokenService.ReceivedUserId);
+    Assert.Null(result.AccessToken);
   }
 
   [Fact]
@@ -114,5 +123,7 @@ public sealed class LoginUserHandlerTests
     Assert.NotEmpty(result.ValidationErrors);
     Assert.Null(repository.RequestedNormalizedEmail);
     Assert.Null(passwordHasher.ReceivedProvidedPassword);
+    Assert.Null(tokenService.ReceivedUserId);
+    Assert.Null(result.AccessToken);
   }
 }
