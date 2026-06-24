@@ -3,6 +3,10 @@ using Bloodline.Application;
 using Bloodline.Infrastructure;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Text;
+using Bloodline.Infrastructure.Identity.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +34,41 @@ builder.Services
         tags: ["database", "ready"]
     );
 
+var jwtOptions = builder.Configuration
+    .GetSection(JwtOptions.SectionName)
+    .Get<JwtOptions>()
+    ?? throw new InvalidOperationException("JWT configuration not found in configuration.");
+
+builder.Services.AddAuthentication(
+    JwtBearerDefaults.AuthenticationScheme
+).AddJwtBearer(
+    options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+
+            ValidateLifetime = true,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtOptions.SigningKey)
+            ),
+            ClockSkew = TimeSpan.Zero
+        };
+    }
+);
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSerilogRequestLogging();
 
