@@ -14,17 +14,20 @@ public static class DependencyInjection
 {
   public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
   {
-    var connectionString = 
-        configuration.GetConnectionString("PostgreSql") 
+    var connectionString =
+        configuration.GetConnectionString("PostgreSql")
         ?? throw new InvalidOperationException("Connection string 'PostgreSql' not found or configuration is invalid.");
 
     services.AddDbContext<BloodlineDbContext>(options => options.UseNpgsql(connectionString));
 
     services.AddScoped<IUserRepository, UserRepository>();
 
-    services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
+    services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 
+    services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
+    services.AddSingleton<ITokenService, JwtTokenService>();
     services.AddSingleton<IClock, SystemClock>();
+    services.AddSingleton(TimeProvider.System);
 
     return services;
   }
