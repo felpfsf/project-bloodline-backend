@@ -1,0 +1,68 @@
+info:
+  name: Login
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/auth/login"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{email}}",
+        "password": "{{password}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.setEnvVar("bearerToken", res.body.accessToken);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: example
+    request:
+      url: "{{baseUrl}}/auth/login"
+      method: POST
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "email": "{{email}}",
+            "password": "{{password}}"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Mon, 29 Jun 2026 15:57:21 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: json
+        data: |-
+          {
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZjczODc1NS1hMDZiLTRkNDItYmQ4NS03MDdiZjU0MzNkYTIiLCJqdGkiOiJkNTA4ZjUzZS1lNmQyLTQ3YzQtYjE1ZS02ZTlkZjMwODllOTQiLCJpYXQiOjE3ODI3NDg2NDEsIm5iZiI6MTc4Mjc0ODY0MSwiZXhwIjoxNzgyNzUwNDQxLCJpc3MiOiJCbG9vZGxpbmUuQXBpIiwiYXVkIjoiQmxvb2RsaW5lLk1vYmlsZSJ9.bcjd9FEP74AYrfnbO0AiN9-Nvc34JSwpaVZNKpLz92s",
+            "expiresAtUtc": "2026-06-29T16:27:21.315117+00:00"
+          }

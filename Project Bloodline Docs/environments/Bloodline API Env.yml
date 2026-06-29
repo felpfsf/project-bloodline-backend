@@ -1,0 +1,10 @@
+name: Bloodline API Env
+variables:
+  - name: baseUrl
+    value: http://localhost:5226/api
+  - secret: true
+    name: bearerToken
+  - name: email
+    value: felipe@email.com
+  - name: password
+    value: Password123

@@ -1,0 +1,91 @@
+opencollection: 1.0.0
+
+info:
+  name: Project Bloodline API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+docs:
+  content: |
+    # Project Bloodline API
+
+    API backend do **Project Bloodline** — um game assíncrono dark fantasy mobile-first, inspirado em browser games clássicos como BiteFight, OGame e Gladiatus.
+
+    O jogo apresenta facções em conflito (Vampiros e Lobisomens), progressão baseada em caçadas temporizadas, evolução de atributos, PvP automático e ranking global.
+
+    ---
+
+    ## Stack
+
+    - **.NET / ASP.NET Core** — runtime e framework HTTP
+    - **PostgreSQL** — fonte primária de verdade
+    - **Redis** — cache, rate limit e ranking derivado
+    - **Docker** — ambiente local e infraestrutura de suporte
+
+    ---
+
+    ## Autenticação
+
+    A API utiliza **JWT Bearer Token**.
+
+    Fluxo padrão:
+
+    1. Registre um usuário em `POST /api/auth/register`
+    2. Obtenha o token em `POST /api/auth/login`
+    3. Use o token no header `Authorization: Bearer <token>` nas rotas protegidas
+
+    > O request **Login** já está configurado com um script `post-response` que salva automaticamente o `accessToken` na variável `{{bearerToken}}` do environment ativo.
+
+    ---
+
+    ## Environments
+
+    | Variável | Descrição |
+    |---|---|
+    | `baseUrl` | URL base da API |
+    | `email` | E-mail padrão para testes |
+    | `password` | Senha padrão para testes |
+    | `bearerToken` | Token JWT preenchido automaticamente após o login |
+
+    ---
+
+    ## Endpoints disponíveis
+
+    ### Auth
+
+    | Método | Rota | Auth | Descrição |
+    |---|---|---|---|
+    | `POST` | `/api/auth/register` | — | Registra um novo usuário |
+    | `POST` | `/api/auth/login` | — | Autentica e retorna JWT |
+    | `GET` | `/api/auth/me` | Bearer | Retorna o usuário autenticado |
+
+    ### Health
+
+    | Método | Rota | Descrição |
+    |---|---|---|
+    | `GET` | `/health` | Status geral da aplicação |
+    | `GET` | `/health/ready` | Verifica dependências (PostgreSQL) |
+
+    ---
+
+    ## Observações
+
+    - Todos os timestamps são em **UTC** (`DateTimeOffset`)
+    - O backend é **server-authoritative**: XP, ouro, energia, cooldowns e recompensas são sempre calculados e validados no servidor
+    - Erros de negócio retornam códigos semânticos no corpo da resposta (ex: `insufficient_energy`, `reward_already_claimed`)
+  type: text/markdown
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
