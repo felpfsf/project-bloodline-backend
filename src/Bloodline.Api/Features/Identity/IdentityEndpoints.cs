@@ -1,5 +1,6 @@
 using Bloodline.Api.Features.Identity.Login;
 using Bloodline.Api.Features.Identity.Register;
+using Bloodline.Api.Features.Me;
 
 namespace Bloodline.Api.Features.Identity;
 
@@ -19,6 +20,11 @@ public static class IdentityEndpoints
       "/login",
       LoginUserEndpoint.HandleAsync
     );
+
+    group.MapGet(
+      "/me",
+      GetCurrentUserEndpoint.Handle
+    ).RequireAuthorization();
 
     return endpoints;
   }

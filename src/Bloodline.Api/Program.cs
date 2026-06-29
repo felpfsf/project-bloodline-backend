@@ -4,6 +4,7 @@ using Bloodline.Infrastructure;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 using Bloodline.Infrastructure.Identity.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,8 @@ var jwtOptions = builder.Configuration
     .Get<JwtOptions>()
     ?? throw new InvalidOperationException("JWT configuration not found in configuration.");
 
+JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
 builder.Services.AddAuthentication(
     JwtBearerDefaults.AuthenticationScheme
 ).AddJwtBearer(
@@ -67,10 +70,10 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseSerilogRequestLogging();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -95,9 +98,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// app.UseAuthentication();
-// app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapHealthChecks("/health/ready", new()
