@@ -1,3 +1,4 @@
+using Bloodline.Api.Common.Http;
 using Bloodline.Application.Identity.Register;
 
 namespace Bloodline.Api.Features.Identity.Register;
@@ -21,28 +22,16 @@ public static class RegisterUserEndpoint
     {
       return result.Error switch
       {
-        RegisterUserError.ValidationFailed => Results.BadRequest(new
-        {
-          code = RegisterUserHttpCodes.ValidationFailed,
-          message = "One or more validation errors occurred.",
-          errors = result.ValidationErrors.Select(error => new
-          {
-            property = error.PropertyName,
-            code = error.ErrorCode,
-            message = error.ErrorMessage
-          })
-        }),
-
-        RegisterUserError.EmailAlreadyExists => Results.Conflict(new
-        {
-          code = RegisterUserHttpCodes.EmailAlreadyExists,
-          message = "A user with the provided email already exists."
-        }),
+        RegisterUserError.ValidationFailed => result.ValidationErrors.ValidationProblem(),
+        RegisterUserError.EmailAlreadyExists => ProblemDetailsExtensions.ConflictProblem(
+          title: "Registration conflict",
+          detail: "A user with the provided email already exists.",
+          code: RegisterUserHttpCodes.EmailAlreadyExists
+        ),
         _ => Results.Problem(
-          title: "An unexpected error occurred.",
-          statusCode: StatusCodes.Status500InternalServerError
+          statusCode: StatusCodes.Status500InternalServerError,
+          title: "Unexpected registration error"
         )
-
 
       };
     }

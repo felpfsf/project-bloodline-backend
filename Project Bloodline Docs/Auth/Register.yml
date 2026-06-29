@@ -102,3 +102,32 @@ examples:
             "email": "felipe1@email.com",
             "createdAtUtc": "2026-06-29T16:06:40.201704+00:00"
           }
+  - name: example conflict
+    request:
+      url: "{{baseUrl}}/auth/register"
+      method: POST
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "email": "felipe1@email.com",
+            "password": "{{password}}"
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Mon, 29 Jun 2026 22:44:11 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: '{"type":"https://httpstatuses.com/409","title":"Registration conflict","status":409,"detail":"A user with the provided email already exists.","code":"email_already_exists","traceId":"00-9b233fe47ce6e2edcf1ebdf7c61ab6e1-568d9c6087edd00b-00"}'

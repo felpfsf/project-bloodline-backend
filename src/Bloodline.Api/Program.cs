@@ -21,6 +21,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
         .Enrich.WithProperty("ApplicationName", "Bloodline.Api");
 });
 
+builder.Services.AddProblemDetails();
 
 builder.Services.AddOpenApi();
 
@@ -69,6 +70,8 @@ builder.Services.AddAuthentication(
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.UseSerilogRequestLogging();
 

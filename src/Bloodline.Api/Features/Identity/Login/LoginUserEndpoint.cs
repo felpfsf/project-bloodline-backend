@@ -1,3 +1,4 @@
+using Bloodline.Api.Common.Http;
 using Bloodline.Application.Identity.Login;
 
 namespace Bloodline.Api.Features.Identity.Login;
@@ -21,23 +22,12 @@ public static class LoginUserEndpoint
     {
       return result.Error switch
       {
-        LoginUserError.ValidationFailed =>
-          Results.BadRequest(new
-          {
-            code = "validation_failed",
-            message = "Validation failed.",
-            errors = result.ValidationErrors.Select(error => new
-            {
-              property = error.PropertyName,
-              code = error.ErrorCode,
-              message = error.ErrorMessage
-            })
-          }),
-        LoginUserError.InvalidCredentials => Results.Unauthorized(),
+        LoginUserError.ValidationFailed => result.ValidationErrors.ValidationProblem(),
+        LoginUserError.InvalidCredentials => ProblemDetailsExtensions.UnauthorizedProblem(),
         _ => Results.Problem(
-          title: "An unexpected error occurred.",
-          statusCode: StatusCodes.Status500InternalServerError
-          )
+          statusCode: StatusCodes.Status500InternalServerError,
+          title: "An unexpected login error occurred."
+        )
       };
     }
 

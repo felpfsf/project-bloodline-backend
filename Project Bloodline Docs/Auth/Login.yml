@@ -66,3 +66,32 @@ examples:
             "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZjczODc1NS1hMDZiLTRkNDItYmQ4NS03MDdiZjU0MzNkYTIiLCJqdGkiOiJkNTA4ZjUzZS1lNmQyLTQ3YzQtYjE1ZS02ZTlkZjMwODllOTQiLCJpYXQiOjE3ODI3NDg2NDEsIm5iZiI6MTc4Mjc0ODY0MSwiZXhwIjoxNzgyNzUwNDQxLCJpc3MiOiJCbG9vZGxpbmUuQXBpIiwiYXVkIjoiQmxvb2RsaW5lLk1vYmlsZSJ9.bcjd9FEP74AYrfnbO0AiN9-Nvc34JSwpaVZNKpLz92s",
             "expiresAtUtc": "2026-06-29T16:27:21.315117+00:00"
           }
+  - name: example unauth
+    request:
+      url: "{{baseUrl}}/auth/login"
+      method: POST
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "email": "felip1e@email.com",
+            "password": "{{password}}"
+          }
+    response:
+      status: 401
+      statusText: Unauthorized
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Mon, 29 Jun 2026 22:44:31 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: '{"type":"https://httpstatuses.com/401","title":"Invalid credentials","status":401,"detail":"The provided credentials are invalid. Please check your email and password and try again.","code":"invalid_credentials","traceId":"00-8dd97267c6cc90830dade721d5ceb8a8-62064456aea623bb-00"}'
