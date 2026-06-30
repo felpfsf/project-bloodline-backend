@@ -3,12 +3,11 @@ using Bloodline.Application.Identity.Abstractions;
 using Bloodline.Infrastructure.Common.Time;
 using Bloodline.Infrastructure.Identity.Persistence;
 using Bloodline.Infrastructure.Identity.Security;
-using Bloodline.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Bloodline.Infrastructure;
+namespace Bloodline.Infrastructure.Persistence;
 
 public static class DependencyInjection
 {
@@ -28,6 +27,11 @@ public static class DependencyInjection
     services.AddSingleton<ITokenService, JwtTokenService>();
     services.AddSingleton<IClock, SystemClock>();
     services.AddSingleton(TimeProvider.System);
+
+    services.AddOptions<JwtOptions>()
+        .Bind(configuration.GetSection(JwtOptions.SectionName))
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
     return services;
   }
