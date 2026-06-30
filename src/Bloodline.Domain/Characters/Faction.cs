@@ -1,4 +1,4 @@
-namespace Bloodline.Domain.Character;
+namespace Bloodline.Domain.Characters;
 
 public enum Faction
 {

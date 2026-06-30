@@ -1,4 +1,4 @@
-namespace Bloodline.Domain.Character;
+namespace Bloodline.Domain.Characters;
 
 public sealed class Character
 {
@@ -15,7 +15,7 @@ public sealed class Character
   public int Strength { get; private set; }
   public int Defense { get; private set; }
   public int Agility { get; private set; }
-  public DateTime CreatedAtUtc { get; private set; }
+  public DateTimeOffset CreatedAtUtc { get; private set; }
 
   private Character() { }
 
@@ -28,7 +28,7 @@ public sealed class Character
     int strength,
     int defense,
     int agility,
-    DateTime createdAtUtc
+    DateTimeOffset createdAtUtc
   )
   {
     Id = id;
@@ -55,7 +55,7 @@ public sealed class Character
     Guid userId,
     string name,
     Faction faction,
-    DateTime createdAtUtc
+    DateTimeOffset createdAtUtc
   )
   {
     if (userId == Guid.Empty)

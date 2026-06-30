@@ -1,4 +1,4 @@
-using Bloodline.Domain.Character;
+using Bloodline.Domain.Characters;
 using Bloodline.Domain.Identity;
 using Microsoft.EntityFrameworkCore;
 
