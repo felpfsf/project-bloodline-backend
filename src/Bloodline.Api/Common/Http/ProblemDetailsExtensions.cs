@@ -17,21 +17,33 @@ public static class ProblemDetailsExtensions
             .ToArray()
       );
 
-    var problemDetails = new ValidationProblemDetails(errors)
-    {
-      Type = "https://httpstatuses.com/400", // https://bloodline.com/probs/validation
-      Title = "Validation failed",
-      Status = StatusCodes.Status400BadRequest
-    };
+    // var problemDetails = new ValidationProblemDetails(errors)
+    // {
+    //   Type = "https://httpstatuses.com/400", // https://bloodline.com/probs/validation
+    //   Title = "Validation failed",
+    //   Status = StatusCodes.Status400BadRequest
+    // };
 
-    problemDetails.Extensions["traceId"] = Activity.Current?.Id;
+    // problemDetails.Extensions["traceId"] = Activity.Current?.Id;
+
+    // return Results.ValidationProblem(
+    //   errors,
+    //   title: problemDetails.Title,
+    //   type: problemDetails.Type,
+    //   statusCode: problemDetails.Status
+    // );
 
     return Results.ValidationProblem(
       errors,
-      title: problemDetails.Title,
-      type: problemDetails.Type,
-      statusCode: problemDetails.Status
+      title: "Validation failed",
+      type: "https://httpstatuses.com/400", // https://bloodline.com/probs/validation
+      statusCode: StatusCodes.Status400BadRequest,
+      extensions: new Dictionary<string, object?>
+      {
+        ["traceId"] = Activity.Current?.Id
+      }
     );
+
   }
 
   public static IResult ConflictProblem(
