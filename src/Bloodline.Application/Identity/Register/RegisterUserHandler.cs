@@ -8,25 +8,17 @@ using FluentValidation;
 
 namespace Bloodline.Application.Identity.Register;
 
-public sealed class RegisterUserHandler
-{
-  private readonly IUserRepository _userRepository;
-  private readonly IPasswordHasher _passwordHasher;
-  private readonly IClock _clock;
-  private readonly IValidator<RegisterUserCommand> _validator;
-
-  public RegisterUserHandler(
-    IUserRepository userRepository,
-    IPasswordHasher passwordHasher,
-    IClock clock,
-    IValidator<RegisterUserCommand> validator
+public sealed class RegisterUserHandler(
+  IUserRepository userRepository,
+  IPasswordHasher passwordHasher,
+  IClock clock,
+  IValidator<RegisterUserCommand> validator
   )
-  {
-    _userRepository = userRepository;
-    _passwordHasher = passwordHasher;
-    _clock = clock;
-    _validator = validator;
-  }
+{
+  private readonly IUserRepository _userRepository = userRepository;
+  private readonly IPasswordHasher _passwordHasher = passwordHasher;
+  private readonly IClock _clock = clock;
+  private readonly IValidator<RegisterUserCommand> _validator = validator;
 
   public async Task<RegisterUserResult> HandleAsync(
     RegisterUserCommand command,

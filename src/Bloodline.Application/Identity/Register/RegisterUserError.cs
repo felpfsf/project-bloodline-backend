@@ -1,5 +1,8 @@
-public enum RegisterUserError
+namespace Bloodline.Application.Identity.Register
 {
-  EmailAlreadyExists,
-  ValidationFailed
+  public enum RegisterUserError
+  {
+    EmailAlreadyExists,
+    ValidationFailed
+  }
 }
