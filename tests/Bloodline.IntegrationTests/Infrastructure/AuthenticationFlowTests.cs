@@ -76,6 +76,54 @@ public sealed class AuthenticationFlowTests(PostgreSqlFixture fixture)
   }
 
   [Fact]
+  public async Task Register_ShouldReturnConflict_WhenEmailAlreadyExists()
+  {
+    // Arrange
+    using var client = _factory.CreateClient();
+
+    var email = $"player{Guid.NewGuid():N}@bloodline.com";
+    const string password = "TestPassword123!";
+
+    // Act - First registration
+    await client.PostAsJsonAsync("/api/auth/register", new { email, password });
+
+    // Act - Duplicate registration
+    var duplicateResponse = await client.PostAsJsonAsync("/api/auth/register", new { email, password });
+
+    // Assert
+    Assert.Equal(
+      HttpStatusCode.Conflict,
+      duplicateResponse.StatusCode
+    );
+  }
+
+  [Fact]
+  public async Task Login_ShouldReturnUnauthorized_WhenPasswordIsWrong()
+  {
+    // Arrange
+    using var client = _factory.CreateClient();
+
+    var email = $"player{Guid.NewGuid():N}@bloodline.com";
+    const string password = "TestPassword123!";
+
+    // Act - Register
+    await client.PostAsJsonAsync("/api/auth/register", new { email, password });
+
+    // Act - Login with wrong password
+    var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new
+    {
+      email,
+      password = "WrongPassword999!"
+    });
+
+    // Assert
+    Assert.Equal(
+      HttpStatusCode.Unauthorized,
+      loginResponse.StatusCode
+    );
+  }
+
+  [Fact]
   public async Task GetMe_ShouldReturnUnauthorized_WhenNoTokenProvided()
   {
     // Arrange
