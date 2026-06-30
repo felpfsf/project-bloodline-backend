@@ -1,6 +1,5 @@
 using Bloodline.Api.Features.Identity;
 using Bloodline.Application;
-using Bloodline.Infrastructure;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
@@ -8,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Bloodline.Infrastructure.Identity.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Bloodline.Infrastructure.Persistence;
 
 
 var builder = WebApplication.CreateBuilder(args);
