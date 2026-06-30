@@ -22,6 +22,82 @@ namespace Bloodline.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Bloodline.Domain.Character.Character", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Agility")
+                        .HasColumnType("integer")
+                        .HasColumnName("agility");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<int>("Defense")
+                        .HasColumnType("integer")
+                        .HasColumnName("defense");
+
+                    b.Property<int>("Energy")
+                        .HasColumnType("integer")
+                        .HasColumnName("energy");
+
+                    b.Property<long>("Experience")
+                        .HasColumnType("bigint")
+                        .HasColumnName("experience");
+
+                    b.Property<short>("Faction")
+                        .HasColumnType("smallint")
+                        .HasColumnName("faction");
+
+                    b.Property<long>("Gold")
+                        .HasColumnType("bigint")
+                        .HasColumnName("gold");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer")
+                        .HasColumnName("level");
+
+                    b.Property<int>("MaxEnergy")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_energy");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("normalized_name");
+
+                    b.Property<int>("Strength")
+                        .HasColumnType("integer")
+                        .HasColumnName("strength");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("ux_characters_normalized_name");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_characters_user_id");
+
+                    b.ToTable("characters", (string)null);
+                });
+
             modelBuilder.Entity("Bloodline.Domain.Identity.User", b =>
                 {
                     b.Property<Guid>("Id")
