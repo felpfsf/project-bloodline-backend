@@ -7,58 +7,31 @@ using FluentValidation;
 
 namespace Bloodline.Application.Characters.CreateCharacter;
 
-public sealed class CreateCharacterHandler
-{
-  private readonly ICharacterRepository _characterRepository;
-  private readonly IClock _clock;
-  private readonly IValidator<CreateCharacterCommand> _validator;
-
-  public CreateCharacterHandler(
-    ICharacterRepository characterRepository,
-    IClock clock,
-    IValidator<CreateCharacterCommand> validator
+public sealed class CreateCharacterHandler(
+  ICharacterRepository characterRepository,
+  IClock clock,
+  IValidator<CreateCharacterCommand> validator
   )
-  {
-    _characterRepository = characterRepository;
-    _clock = clock;
-    _validator = validator;
-  }
+{
+  private readonly ICharacterRepository _characterRepository = characterRepository;
+  private readonly IClock _clock = clock;
+  private readonly IValidator<CreateCharacterCommand> _validator = validator;
 
   public async Task<CreateCharacterResult> HandleAsync(
     CreateCharacterCommand command,
     CancellationToken cancellationToken
   )
   {
-    var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-
-    if (!validationResult.IsValid)
-    {
-      var errors = validationResult.Errors
-          .Select(error => new ValidationError(
-            error.PropertyName,
-            error.ErrorCode,
-            error.ErrorMessage
-          ))
-          .ToList();
-
-      return CreateCharacterResult.ValidationFailure(errors);
-    }
+    var validationGuard = await ValidateCommandAsync(command, cancellationToken);
+    if (validationGuard is not null) return validationGuard;
 
     var normalizedName = command.Name.Trim().ToUpperInvariant();
 
-    var userAlreadyHasCharacter = await _characterRepository.ExistsByUserIdAsync(command.UserId, cancellationToken);
+    var userGuard = await CheckUserAlreadyHasCharacterAsync(command.UserId, cancellationToken);
+    if (userGuard is not null) return userGuard;
 
-    if (userAlreadyHasCharacter)
-    {
-      return CreateCharacterResult.Failure(CreateCharacterError.UserAlreadyHasCharacter);
-    }
-
-    var nameAlreadyTaken = await _characterRepository.ExistsByNormalizedNameAsync(normalizedName, cancellationToken);
-
-    if (nameAlreadyTaken)
-    {
-      return CreateCharacterResult.Failure(CreateCharacterError.NameAlreadyTaken);
-    }
+    var nameGuard = await CheckNameAlreadyTakenAsync(normalizedName, cancellationToken);
+    if (nameGuard is not null) return nameGuard;
 
     var character = Character.Create(
       command.UserId,
@@ -96,6 +69,41 @@ public sealed class CreateCharacterHandler
       agility: character.Agility,
       createdAtUtc: character.CreatedAtUtc
     );
+  }
+
+  private async Task<CreateCharacterResult?> ValidateCommandAsync(CreateCharacterCommand command, CancellationToken cancellationToken)
+  {
+    var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+
+    if (validationResult.IsValid) return null;
+
+    var errors = validationResult.Errors
+        .Select(error => new ValidationError(
+          error.PropertyName,
+          error.ErrorCode,
+          error.ErrorMessage
+        ))
+        .ToList();
+
+    return CreateCharacterResult.ValidationFailure(errors);
+  }
+
+  private async Task<CreateCharacterResult?> CheckUserAlreadyHasCharacterAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    var exists = await _characterRepository.ExistsByUserIdAsync(userId, cancellationToken);
+
+    return exists
+      ? CreateCharacterResult.Failure(CreateCharacterError.UserAlreadyHasCharacter)
+      : null;
+  }
+
+  private async Task<CreateCharacterResult?> CheckNameAlreadyTakenAsync(string normalizedName, CancellationToken cancellationToken)
+  {
+    var taken = await _characterRepository.ExistsByNormalizedNameAsync(normalizedName, cancellationToken);
+
+    return taken
+      ? CreateCharacterResult.Failure(CreateCharacterError.NameAlreadyTaken)
+      : null;
   }
 
 }
