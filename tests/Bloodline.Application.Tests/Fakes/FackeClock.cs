@@ -1,6 +1,6 @@
 using Bloodline.Application.Common.Time;
 
-namespace Bloodline.Application.Tests.Identity.Fakes;
+namespace Bloodline.Application.Tests.Fakes;
 
 internal sealed class FakeClock : IClock
 {
