@@ -1,5 +1,7 @@
+using Bloodline.Application.Characters.Abstractions;
 using Bloodline.Application.Common.Time;
 using Bloodline.Application.Identity.Abstractions;
+using Bloodline.Infrastructure.Characters.Persistence;
 using Bloodline.Infrastructure.Common.Time;
 using Bloodline.Infrastructure.Identity.Persistence;
 using Bloodline.Infrastructure.Identity.Security;
@@ -20,6 +22,7 @@ public static class DependencyInjection
     services.AddDbContext<BloodlineDbContext>(options => options.UseNpgsql(connectionString));
 
     services.AddScoped<IUserRepository, UserRepository>();
+    services.AddScoped<ICharacterRepository, CharacterRepository>();
 
     services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 
