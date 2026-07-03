@@ -1,3 +1,4 @@
+using Bloodline.Application.Characters.CreateCharacter;
 using Bloodline.Application.Identity.Login;
 using Bloodline.Application.Identity.Register;
 using FluentValidation;
@@ -13,9 +14,11 @@ public static class DependencyInjection
   {
     services.AddScoped<RegisterUserHandler>();
     services.AddScoped<LoginUserHandler>();
+    services.AddScoped<CreateCharacterHandler>();
 
     services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
     services.AddScoped<IValidator<LoginCommand>, LoginUserCommandValidator>();
+    services.AddScoped<IValidator<CreateCharacterCommand>, CreateCharacterCommandValidator>();
 
     return services;
   }

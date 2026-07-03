@@ -53,6 +53,8 @@ public sealed record CreateCharacterResult
   public CreateCharacterError? Error { get; }
   public IReadOnlyCollection<ValidationError> ValidationErrors { get; }
 
+  public bool IsSuccess => Error is null;
+
   public static CreateCharacterResult Success(
     Guid id,
     string name,
