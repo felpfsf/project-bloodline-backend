@@ -7,4 +7,5 @@ public interface ICharacterRepository
   Task<bool> ExistsByUserIdAsync(Guid userId, CancellationToken cancellationToken);
   Task<bool> ExistsByNormalizedNameAsync(string normalizedName, CancellationToken cancellationToken);
   Task CreateAsync(Character character, CancellationToken cancellationToken);
+  Task<Character?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 }
