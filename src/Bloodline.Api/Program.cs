@@ -8,6 +8,7 @@ using Bloodline.Infrastructure.Identity.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Bloodline.Infrastructure.Persistence;
+using Bloodline.Api.Features.Characters;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -110,6 +111,7 @@ app.MapHealthChecks("/health/ready", new()
 
 
 app.MapIdentityEndpoints();
+app.MapCharacterEndpoints();
 
 app.MapGet("/", () => Results.Ok(new
 {
