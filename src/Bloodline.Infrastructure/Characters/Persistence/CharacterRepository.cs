@@ -24,6 +24,16 @@ public sealed class CharacterRepository(BloodlineDbContext dbContext) : ICharact
     catch (DbUpdateException exception)
       when (exception.InnerException is PostgresException postgresException &&
             postgresException.SqlState == PostgresErrorCodes.UniqueViolation &&
+            postgresException.ConstraintName == UserIdUniqueConstraint)
+    {
+      throw new UniqueConstraintViolationException(
+        UserIdUniqueConstraint,
+        exception
+      );
+    }
+    catch (DbUpdateException exception)
+      when (exception.InnerException is PostgresException postgresException &&
+            postgresException.SqlState == PostgresErrorCodes.UniqueViolation &&
             postgresException.ConstraintName == NormalizedNameUniqueConstraint)
     {
       throw new UniqueConstraintViolationException(
@@ -47,5 +57,10 @@ public sealed class CharacterRepository(BloodlineDbContext dbContext) : ICharact
       character => character.UserId == userId,
       cancellationToken
     );
+  }
+
+  public Task<Character?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return _dbcontext.Characters.AsNoTracking().SingleOrDefaultAsync(character => character.UserId == userId, cancellationToken);
   }
 }
