@@ -1,0 +1,146 @@
+info:
+  name: Create Character
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/characters/"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Draven",
+        "faction": "vampire"
+      }
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: example created
+    request:
+      url: "{{baseUrl}}/characters/"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Draven",
+            "faction": "vampire"
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Fri, 03 Jul 2026 03:07:58 GMT
+        - name: server
+          value: Kestrel
+        - name: location
+          value: /api/characters/bce47713-0fb3-4977-acfa-44e5949f3bc6
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: json
+        data: |-
+          {
+            "id": "bce47713-0fb3-4977-acfa-44e5949f3bc6",
+            "name": "Draven",
+            "faction": "vampire",
+            "level": 1,
+            "experience": 0,
+            "gold": 0,
+            "energy": 100,
+            "maxEnergy": 100,
+            "strength": 10,
+            "defense": 9,
+            "agility": 12,
+            "createdAtUtc": "2026-07-03T03:07:59.453438+00:00"
+          }
+  - name: example user already has character
+    request:
+      url: "{{baseUrl}}/characters/"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Draven",
+            "faction": "vampire"
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Fri, 03 Jul 2026 03:08:18 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: '{"type":"https://httpstatuses.com/409","title":"Character creation conflict","status":409,"detail":"The user already has a character.","code":"user_already_has_character","traceId":"00-30a3743a4ff794d58885bc0be299905f-12be9f2bb0d8636c-00"}'
+  - name: example Invalid character name
+    request:
+      url: "{{baseUrl}}/characters/"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "name": " Draven",
+            "faction": "vampire"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Fri, 03 Jul 2026 03:09:01 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: '{"type":"https://httpstatuses.com/400","title":"Validation failed","status":400,"errors":{"Name":["Name can only contain letters, numbers, spaces, underscores and hyphens, and cannot start or end with a space."]},"traceId":"00-898286472de9f794501f6f184ffd11ff-9c4b52914927e975-00"}'
+  - name: example Invalid Alliance
+    request:
+      url: "{{baseUrl}}/characters/"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Draven",
+            "faction": "alliance"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Fri, 03 Jul 2026 03:09:30 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: "{\"type\":\"https://httpstatuses.com/400\",\"title\":\"Validation failed\",\"status\":400,\"errors\":{\"Faction\":[\"'Faction' possui um intervalo de valores que não inclui '0'.\"]},\"traceId\":\"00-ed9def3cb67eb4d9b848a2d0a4e79efb-3a216b46d105d1a1-00\"}"
