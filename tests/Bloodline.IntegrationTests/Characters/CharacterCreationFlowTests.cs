@@ -1,8 +1,6 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Bloodline.Api.Features.Characters.CreateCharacter;
-using Bloodline.Api.Features.Identity.Login;
 using Bloodline.IntegrationTests.Infrastructure;
 
 namespace Bloodline.IntegrationTests.Characters;
@@ -16,11 +14,7 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
   public async Task CreateCharacter_ShouldCreateVampire_WhenAuthenticated()
   {
     // Arrange
-    using var client = _factory.CreateClient();
-
-    var accessToken = await RegisterAndLoginAsync(client);
-
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    using var client = await TestAuthUtils.CreateAuthenticatedClientAsync(_factory);
 
     // Act
     var response = await client.PostAsJsonAsync("api/characters", new
@@ -80,22 +74,18 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
   public async Task CreateCharacter_ShouldReturnConflict_WhenUserAlreadyHasCharacter()
   {
     // Arrange
-    using var client = _factory.CreateClient();
-
-    var accessToken = await RegisterAndLoginAsync(client);
-
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    using var client = await TestAuthUtils.CreateAuthenticatedClientAsync(_factory);
 
     await client.PostAsJsonAsync("api/characters", new
     {
-      Name = UniqueCharacterName("Draven"),
+      Name = TestAuthUtils.UniqueCharacterName("Draven"),
       Faction = "vampire"
     });
 
     // Act
     var duplicateResponse = await client.PostAsJsonAsync("api/characters", new
     {
-      Name = UniqueCharacterName("Fenrir"),
+      Name = TestAuthUtils.UniqueCharacterName("Fenrir"),
       Faction = "werewolf"
     });
 
@@ -107,13 +97,9 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
   public async Task CreateCharacter_ShouldReturnConflict_WhenNameAlreadyExists()
   {
     // Arrange
-    using var client = _factory.CreateClient();
+    using var client = await TestAuthUtils.CreateAuthenticatedClientAsync(_factory);
 
-    var accessToken = await RegisterAndLoginAsync(client);
-
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-    var characterName = UniqueCharacterName("Draven");
+    var characterName = TestAuthUtils.UniqueCharacterName("Draven");
 
     var firstResponse = await client.PostAsJsonAsync("api/characters", new
     {
@@ -125,11 +111,7 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
     Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
 
     // Arrange - second account tries same name
-    using var secondClient = _factory.CreateClient();
-
-    var secondAccessToken = await RegisterAndLoginAsync(secondClient);
-
-    secondClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", secondAccessToken);
+    using var secondClient = await TestAuthUtils.CreateAuthenticatedClientAsync(_factory);
 
     var duplicateResponse = await secondClient.PostAsJsonAsync("api/characters", new
     {
@@ -145,15 +127,11 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
   public async Task CreateCharacter_ShouldReturnBadRequest_WhenFactionIsInvalid()
   {
     // Arrange
-    using var client = _factory.CreateClient();
-
-    var accessToken = await RegisterAndLoginAsync(client);
-
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    using var client = await TestAuthUtils.CreateAuthenticatedClientAsync(_factory);
 
     var invalidFactionResponse = await client.PostAsJsonAsync("api/characters", new
     {
-      Name = UniqueCharacterName("Draven"),
+      Name = TestAuthUtils.UniqueCharacterName("Draven"),
       Faction = "alliance"
     });
 
@@ -165,11 +143,7 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
   public async Task CreateCharacter_ShouldReturnBadRequest_WhenNameIsInvalid()
   {
     // Arrange
-    using var client = _factory.CreateClient();
-
-    var accessToken = await RegisterAndLoginAsync(client);
-
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    using var client = await TestAuthUtils.CreateAuthenticatedClientAsync(_factory);
 
     var invalidNameResponse = await client.PostAsJsonAsync("api/characters", new
     {
@@ -179,37 +153,6 @@ public sealed class CharacterCreationFlowTests(PostgreSqlFixture fixture)
 
     // Assert
     Assert.Equal(HttpStatusCode.BadRequest, invalidNameResponse.StatusCode);
-  }
-
-  private static string UniqueCharacterName(string prefix) => $"{prefix}{Guid.NewGuid():N}"[..(prefix.Length + 8)];
-
-  private static async Task<string> RegisterAndLoginAsync(HttpClient client)
-  {
-    var email = $"player{Guid.NewGuid():N}@bloodline.com";
-    const string password = "Password123!";
-
-    var registerResponse = await client.PostAsJsonAsync("api/auth/register", new
-    {
-      Email = email,
-      Password = password
-    });
-
-    Assert.Equal(HttpStatusCode.Created, registerResponse.StatusCode);
-
-    var loginResponse = await client.PostAsJsonAsync("api/auth/login", new
-    {
-      Email = email,
-      Password = password
-    });
-
-    Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-
-    var loginBody = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
-
-    Assert.NotNull(loginBody);
-    Assert.False(string.IsNullOrWhiteSpace(loginBody!.AccessToken));
-
-    return loginBody.AccessToken;
   }
 
 }
