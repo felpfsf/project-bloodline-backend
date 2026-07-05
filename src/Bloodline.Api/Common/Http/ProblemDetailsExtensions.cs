@@ -79,4 +79,23 @@ public static class ProblemDetailsExtensions
       }
     );
   }
+
+  public static IResult NotFound(
+    string title,
+    string detail,
+    string code
+  )
+  {
+    return Results.Problem(
+      statusCode: StatusCodes.Status404NotFound,
+      title: title,
+      detail: detail,
+      type: "https://httpstatuses.com/404", // https://bloodline.com/probs/not_found
+      extensions: new Dictionary<string, object?>
+      {
+        ["code"] = code,
+        ["traceId"] = Activity.Current?.Id
+      }
+    );
+  }
 }

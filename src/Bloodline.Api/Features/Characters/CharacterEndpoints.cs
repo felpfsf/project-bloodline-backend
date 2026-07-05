@@ -1,4 +1,5 @@
 using Bloodline.Api.Features.Characters.CreateCharacter;
+using Bloodline.Api.Features.Characters.GetCurrentCharacter;
 
 namespace Bloodline.Api.Features.Characters;
 
@@ -14,6 +15,11 @@ public static class CharacterEndpoints
     group.MapPost(
       "/",
       CreateCharacterEndpoint.HandleAsync
+    );
+
+    group.MapGet(
+      "/me",
+      GetCurrentCharacterEndpoint.HandleAsync
     );
 
     return endpoints;
