@@ -1,0 +1,17 @@
+info:
+  name: GetCurrentCharacter
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseUrl}}/characters/me"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
