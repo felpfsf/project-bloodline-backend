@@ -103,6 +103,17 @@ public sealed class CharacterTests
     Assert.Throws<ArgumentOutOfRangeException>(() => character.ReceiveHuntRewards(100, -50));
   }
 
+  [Theory]
+  [InlineData(0)]
+  [InlineData(-1)]
+  public void HasEnoughEnergy_ShouldThrow_WhenAmountIsNotPositive(int amount)
+  {
+    var character = CreateCharacter();
+    Assert.Throws<ArgumentOutOfRangeException>(() =>
+      character.HasEnoughEnergy(amount)
+    );
+  }
+
   private static Character CreateCharacter()
   {
     return Character.Create(
