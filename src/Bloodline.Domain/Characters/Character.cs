@@ -15,6 +15,7 @@ public sealed class Character
   public int Strength { get; private set; }
   public int Defense { get; private set; }
   public int Agility { get; private set; }
+
   public DateTimeOffset CreatedAtUtc { get; private set; }
 
   private Character() { }
@@ -83,6 +84,41 @@ public sealed class Character
       stats.Agility,
       createdAtUtc
     );
+  }
+
+  public bool HasEnoughEnergy(int amount)
+  {
+    if (amount <= 0)
+    {
+      throw new ArgumentOutOfRangeException(nameof(amount), "Energy amount must be greater than zero.");
+    }
+    return Energy >= amount;
+  }
+  public void ConsumeEnergy(int amount)
+  {
+    if (amount <= 0)
+    {
+      throw new ArgumentOutOfRangeException(nameof(amount), "Energy amount must be greater than zero.");
+    }
+    if (Energy < amount)
+    {
+      throw new InvalidOperationException("Character does not have enough energy");
+    }
+    Energy -= amount;
+  }
+  public void ReceiveHuntRewards(long experience, long gold)
+  {
+    if (experience < 0)
+    {
+      throw new ArgumentOutOfRangeException(nameof(experience), "Experience reward cannot be negative.");
+    }
+    if (gold < 0)
+    {
+      throw new ArgumentOutOfRangeException(nameof(gold), "Gold reward cannot be negative.");
+    }
+
+    Experience += experience;
+    Gold += gold;
   }
 
   private static string NormalizeName(string name)
