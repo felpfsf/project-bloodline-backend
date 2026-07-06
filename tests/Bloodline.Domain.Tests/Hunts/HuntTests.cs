@@ -1,7 +1,7 @@
-using Bloodline.Domain.Hunt;
+using Bloodline.Domain.Hunts;
 using FluentAssertions;
 
-namespace Bloodline.Domain.Tests.Hunt;
+namespace Bloodline.Domain.Tests.Hunts;
 
 public sealed class HuntTests
 {
@@ -10,7 +10,7 @@ public sealed class HuntTests
   {
     var startsAtUtc = new DateTimeOffset(2026, 7, 6, 12, 0, 0, TimeSpan.Zero);
 
-    var hunt = Bloodline.Domain.Hunt.Hunt.Start(
+    var hunt = Hunt.Start(
       Guid.NewGuid(),
       startsAtUtc,
       TimeSpan.FromMinutes(30),
@@ -78,9 +78,9 @@ public sealed class HuntTests
       .WithMessage("Only active hunts can be completed.");
   }
 
-  private static Bloodline.Domain.Hunt.Hunt CreateHunt(DateTimeOffset startsAtUtc, TimeSpan duration)
+  private static Hunt CreateHunt(DateTimeOffset startsAtUtc, TimeSpan duration)
   {
-    return Bloodline.Domain.Hunt.Hunt.Start(
+    return Hunt.Start(
       Guid.NewGuid(),
       startsAtUtc,
       duration,

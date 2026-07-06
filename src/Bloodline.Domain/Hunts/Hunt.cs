@@ -1,4 +1,4 @@
-namespace Bloodline.Domain.Hunt;
+namespace Bloodline.Domain.Hunts;
 
 public sealed class Hunt
 {
