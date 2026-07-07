@@ -10,10 +10,10 @@ public sealed class BloodlineDbContext(DbContextOptions<BloodlineDbContext> opti
   public DbSet<User> Users => Set<User>();
   public DbSet<Character> Characters => Set<Character>();
 
-  async Task IUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken)
-  {
-    await SaveChangesAsync(cancellationToken);
-  }
+  // public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+  // {
+  //   return base.SaveChangesAsync(cancellationToken);
+  // }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
