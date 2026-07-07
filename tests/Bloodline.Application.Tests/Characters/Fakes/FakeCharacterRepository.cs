@@ -47,4 +47,10 @@ internal sealed class FakeCharacterRepository : ICharacterRepository
     RequestedUserId = userId;
     return Task.FromResult(CharacterToReturn);
   }
+
+  public Task<Character?> GetByUserIdForUpdateAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    RequestedUserId = userId;
+    return Task.FromResult(CharacterToReturn);
+  }
 }

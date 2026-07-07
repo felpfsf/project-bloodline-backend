@@ -12,6 +12,7 @@ public sealed class HuntTests
 
     var hunt = Hunt.Start(
       Guid.NewGuid(),
+      "shadow_hunt",
       startsAtUtc,
       TimeSpan.FromMinutes(30),
       10,
@@ -82,11 +83,33 @@ public sealed class HuntTests
   {
     return Hunt.Start(
       Guid.NewGuid(),
+      "shadow_hunt",
       startsAtUtc,
       duration,
       10,
       50,
       75
     );
+  }
+
+  [Fact]
+  public void Start_ShouldThrow_WhenDefinitionCodeIsNullOrEmpty()
+  {
+    var startsAtUtc = new DateTimeOffset(2026, 7, 6, 12, 0, 0, TimeSpan.Zero);
+
+    var action = () => Hunt.Start(
+      Guid.NewGuid(),
+      " ",
+      startsAtUtc,
+      TimeSpan.FromSeconds(60),
+      10,
+      25,
+      15
+    );
+
+    var exception = action.Should().Throw<ArgumentException>().Which;
+
+    exception.Message.Should().StartWith("Hunt definition code is required.");
+    exception.ParamName.Should().Be("definitionCode");
   }
 }
