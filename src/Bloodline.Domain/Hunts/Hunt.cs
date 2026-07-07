@@ -18,11 +18,14 @@ public sealed class Hunt
   public long ExperienceReward { get; private set; }
   public long GoldReward { get; private set; }
 
+  public string DefinitionCode { get; private set; } = null!;
+
   private Hunt() { }
 
   private Hunt(
     Guid id,
     Guid characterId,
+    string definitionCode,
     DateTimeOffset startsAtUtc,
     DateTimeOffset endsAtUtc,
     int energyCost,
@@ -32,6 +35,7 @@ public sealed class Hunt
   {
     Id = id;
     CharacterId = characterId;
+    DefinitionCode = definitionCode;
     Status = HuntStatus.Active;
     StartsAtUtc = startsAtUtc;
     EndsAtUtc = endsAtUtc;
@@ -43,6 +47,7 @@ public sealed class Hunt
 
   public static Hunt Start(
     Guid characterId,
+    string definitionCode,
     DateTimeOffset startsAtUtc,
     TimeSpan duration,
     int energyCost,
@@ -50,11 +55,12 @@ public sealed class Hunt
     long goldReward
   )
   {
-    ValidateStartParameters(characterId, duration, energyCost, experienceReward, goldReward);
+    ValidateStartParameters(characterId, definitionCode, duration, energyCost, experienceReward, goldReward);
 
     return new Hunt(
       Guid.NewGuid(),
       characterId,
+      definitionCode,
       startsAtUtc,
       startsAtUtc.Add(duration),
       energyCost,
@@ -79,6 +85,7 @@ public sealed class Hunt
 
   private static void ValidateStartParameters(
     Guid characterId,
+    string definitionCode,
     TimeSpan duration,
     int energyCost,
     long experienceReward,
@@ -88,6 +95,11 @@ public sealed class Hunt
     if (characterId == Guid.Empty)
     {
       throw new ArgumentException("Character ID is required.", nameof(characterId));
+    }
+
+    if (string.IsNullOrWhiteSpace(definitionCode))
+    {
+      throw new ArgumentException("Hunt definition code is required.", nameof(definitionCode));
     }
 
     if (duration <= TimeSpan.Zero)

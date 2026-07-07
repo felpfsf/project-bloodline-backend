@@ -63,4 +63,9 @@ public sealed class CharacterRepository(BloodlineDbContext dbContext) : ICharact
   {
     return _dbcontext.Characters.AsNoTracking().SingleOrDefaultAsync(character => character.UserId == userId, cancellationToken);
   }
+
+  public Task<Character?> GetByUserIdForUpdateAsync(Guid userId, CancellationToken cancellationToken)
+  {
+    return _dbcontext.Characters.SingleOrDefaultAsync(character => character.UserId == userId, cancellationToken);
+  }
 }

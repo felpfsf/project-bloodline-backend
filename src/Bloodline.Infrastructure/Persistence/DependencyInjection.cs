@@ -1,4 +1,5 @@
 using Bloodline.Application.Characters.Abstractions;
+using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Common.Time;
 using Bloodline.Application.Identity.Abstractions;
 using Bloodline.Infrastructure.Characters.Persistence;
@@ -23,6 +24,7 @@ public static class DependencyInjection
 
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<ICharacterRepository, CharacterRepository>();
+    services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<BloodlineDbContext>());
 
     services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 
