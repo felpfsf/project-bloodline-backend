@@ -14,6 +14,7 @@ internal sealed class FakeCharacterRepository : ICharacterRepository
   public string? UniqueConstraintToThrow { get; set; }
   public Character? CharacterToReturn { get; set; }
   public Guid? RequestedUserId { get; private set; }
+  public Guid? RequestedUserIdForUpdate { get; private set; }
 
   public Task CreateAsync(Character character, CancellationToken cancellationToken)
   {
@@ -50,7 +51,7 @@ internal sealed class FakeCharacterRepository : ICharacterRepository
 
   public Task<Character?> GetByUserIdForUpdateAsync(Guid userId, CancellationToken cancellationToken)
   {
-    RequestedUserId = userId;
+    RequestedUserIdForUpdate = userId;
     return Task.FromResult(CharacterToReturn);
   }
 }
