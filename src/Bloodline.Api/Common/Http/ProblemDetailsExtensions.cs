@@ -98,4 +98,23 @@ public static class ProblemDetailsExtensions
       }
     );
   }
+
+  public static IResult InternalServerError(
+    string title,
+    string detail,
+    string code
+  )
+  {
+    return Results.Problem(
+      statusCode: StatusCodes.Status500InternalServerError,
+      title: title,
+      detail: detail,
+      type: "https://httpstatuses.com/500", // https://bloodline.com/probs/internal_server_error
+      extensions: new Dictionary<string, object?>
+      {
+        ["code"] = code,
+        ["traceId"] = Activity.Current?.Id
+      }
+    );
+  }
 }
