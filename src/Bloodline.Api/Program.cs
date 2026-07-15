@@ -1,9 +1,11 @@
 using Bloodline.Api.Features.Identity;
 using Bloodline.Application;
+using Bloodline.Application.Identity.Abstractions;
 using Scalar.AspNetCore;
 using Serilog;
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Bloodline.Infrastructure.Identity.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -65,6 +67,25 @@ builder.Services.AddAuthentication(
                 Encoding.UTF8.GetBytes(jwtOptions.SigningKey)
             ),
             ClockSkew = TimeSpan.Zero
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var jti = context.Principal?.FindFirstValue(JwtRegisteredClaimNames.Jti);
+                if (string.IsNullOrEmpty(jti))
+                {
+                    context.Fail("Token is missing jti claim.");
+                    return;
+                }
+
+                var blacklist = context.HttpContext.RequestServices.GetRequiredService<ITokenBlacklist>();
+                var isBlacklisted = await blacklist.IsBlacklistedAsync(jti, context.HttpContext.RequestAborted);
+
+                if (isBlacklisted)
+                    context.Fail("Token has been revoked.");
+            }
         };
     }
 );

@@ -3,6 +3,7 @@ using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Common.Time;
 using Bloodline.Application.Hunts.Abstractions;
 using Bloodline.Application.Identity.Abstractions;
+using Bloodline.Infrastructure.Cache;
 using Bloodline.Infrastructure.Characters.Persistence;
 using Bloodline.Infrastructure.Common.Time;
 using Bloodline.Infrastructure.Hunts.Persistence;
@@ -11,6 +12,7 @@ using Bloodline.Infrastructure.Identity.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Bloodline.Infrastructure.Persistence;
 
@@ -36,6 +38,15 @@ public static class DependencyInjection
     services.AddSingleton<ITokenService, JwtTokenService>();
     services.AddSingleton<IClock, SystemClock>();
     services.AddSingleton(TimeProvider.System);
+
+    var redisConnectionString =
+        configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("Connection string 'Redis' not found or configuration is invalid.");
+
+    services.AddSingleton<IConnectionMultiplexer>(
+        ConnectionMultiplexer.Connect(redisConnectionString)
+    );
+    services.AddSingleton<ITokenBlacklist, RedisTokenBlacklist>();
 
     services.AddOptions<JwtOptions>()
         .Bind(configuration.GetSection(JwtOptions.SectionName))

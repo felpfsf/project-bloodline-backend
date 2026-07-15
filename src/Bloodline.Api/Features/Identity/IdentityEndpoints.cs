@@ -1,4 +1,5 @@
 using Bloodline.Api.Features.Identity.Login;
+using Bloodline.Api.Features.Identity.Logout;
 using Bloodline.Api.Features.Identity.Register;
 using Bloodline.Api.Features.Me;
 
@@ -24,6 +25,11 @@ public static class IdentityEndpoints
     group.MapGet(
       "/me",
       GetCurrentUserEndpoint.Handle
+    ).RequireAuthorization();
+
+    group.MapPost(
+      "/logout",
+      LogoutEndpoint.HandleAsync
     ).RequireAuthorization();
 
     return endpoints;
