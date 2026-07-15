@@ -1,0 +1,17 @@
+info:
+  name: StartHunt
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/hunts"
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
