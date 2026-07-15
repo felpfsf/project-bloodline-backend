@@ -22,7 +22,7 @@ namespace Bloodline.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Bloodline.Domain.Character.Character", b =>
+            modelBuilder.Entity("Bloodline.Domain.Characters.Character", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,7 +33,7 @@ namespace Bloodline.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("agility");
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
@@ -98,6 +98,64 @@ namespace Bloodline.Infrastructure.Persistence.Migrations
                     b.ToTable("characters", (string)null);
                 });
 
+            modelBuilder.Entity("Bloodline.Domain.Hunts.Hunt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CharacterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("character_id");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at_utc");
+
+                    b.Property<string>("DefinitionCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("definition_code");
+
+                    b.Property<DateTimeOffset>("EndsAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ends_at_utc");
+
+                    b.Property<int>("EnergyCost")
+                        .HasColumnType("integer")
+                        .HasColumnName("energy_cost");
+
+                    b.Property<long>("ExperienceReward")
+                        .HasColumnType("bigint")
+                        .HasColumnName("experience_reward");
+
+                    b.Property<long>("GoldReward")
+                        .HasColumnType("bigint")
+                        .HasColumnName("gold_reward");
+
+                    b.Property<DateTimeOffset>("StartsAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("starts_at_utc");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_hunts_character_id_active")
+                        .HasFilter("\"status\" = 1");
+
+                    b.HasIndex("CharacterId", "Status")
+                        .HasDatabaseName("ix_hunts_character_id_status");
+
+                    b.ToTable("hunts", (string)null);
+                });
+
             modelBuilder.Entity("Bloodline.Domain.Identity.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -133,6 +191,15 @@ namespace Bloodline.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ux_users_normalized_email");
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Bloodline.Domain.Hunts.Hunt", b =>
+                {
+                    b.HasOne("Bloodline.Domain.Characters.Character", null)
+                        .WithMany()
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
