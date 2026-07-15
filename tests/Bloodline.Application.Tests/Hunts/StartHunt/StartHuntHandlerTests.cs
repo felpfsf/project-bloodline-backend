@@ -1,3 +1,4 @@
+using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Hunts.StartHunt;
 using Bloodline.Application.Tests.Characters.Fakes;
 using Bloodline.Application.Tests.Fakes;
@@ -138,5 +139,49 @@ public sealed class StartHuntHandlerTests
       Faction.Vampire,
       new DateTimeOffset(2024, 7, 7, 20, 0, 0, TimeSpan.Zero)
     );
+  }
+
+  [Fact]
+  public async Task HandleAsync_Should_Return_HuntAlreadyActive_When_Active_Hunt_Constraint_Is_Violated()
+  {
+    var userId = Guid.NewGuid();
+    var character = CreateCharacter(userId);
+
+    var characterRepository = new FakeCharacterRepository
+    {
+      CharacterToReturn = character
+    };
+
+    var huntRepository = new FakeHuntRepository
+    {
+      HasActiveHunt = false
+    };
+
+    var unitOfWork = new FakeUnitOfWork
+    {
+      UniqueConstraintToThrow = new UniqueConstraintViolationException(
+        "ux_hunts_character_id_active",
+        new Exception("Simulated DB unique constraint violation")
+      )
+    };
+
+    var clock = new FakeClock
+    {
+      UtcNow = new DateTimeOffset(2026, 7, 7, 20, 0, 0, TimeSpan.Zero)
+    };
+
+    var handler = new StartHuntHandler(characterRepository, huntRepository, unitOfWork, clock);
+
+    var result = await handler.HandleAsync(
+      new StartHuntCommand(userId),
+      CancellationToken.None
+    );
+
+    Assert.False(result.IsSuccess);
+    Assert.Equal(StartHuntError.HuntAlreadyActive, result.Error);
+
+    Assert.NotNull(huntRepository.CreatedHunt);
+    Assert.Equal(1, unitOfWork.SaveChangesCallCount);
+
   }
 }

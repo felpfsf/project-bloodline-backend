@@ -54,8 +54,17 @@ public sealed class StartHuntHandler(
       goldReward: definition.GoldReward
     );
 
-    await _huntRepository.CreateAsync(hunt, cancellationToken);
-    await _unitOfWork.SaveChangesAsync(cancellationToken);
+    try
+    {
+      await _huntRepository.CreateAsync(hunt, cancellationToken);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    }
+    catch (UniqueConstraintViolationException exception)
+      when (exception.ConstraintName == "ux_hunts_character_id_active")
+    {
+      return StartHuntResult.Failure(StartHuntError.HuntAlreadyActive);
+    }
 
     return StartHuntResult.Success(
       huntId: hunt.Id,
