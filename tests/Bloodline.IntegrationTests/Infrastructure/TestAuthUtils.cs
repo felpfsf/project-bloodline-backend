@@ -47,4 +47,24 @@ public static class TestAuthUtils
 
     return loginBody.AccessToken;
   }
+
+  public static async Task<string> RegisterLoginAndCreateCharacterAsync(HttpClient client, string characterName)
+  {
+    var accessToken = await RegisterAndLoginAsync(client);
+
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+    var createCharacterResponse = await client.PostAsJsonAsync(
+      "api/characters",
+      new
+      {
+        name = characterName,
+        faction = "vampire"
+      }
+    );
+
+    createCharacterResponse.EnsureSuccessStatusCode();
+
+    return accessToken;
+  }
 }
