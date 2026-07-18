@@ -81,7 +81,7 @@ public static class StartHuntEndpoint
       EnergyCost: result.EnergyCost!.Value,
       ExperienceReward: result.ExperienceReward!.Value,
       GoldReward: result.GoldReward!.Value,
-      RemainingAttempts: result.RemainingEnergy!.Value
+      RemainingEnergy: result.RemainingEnergy!.Value
     );
   }
 }

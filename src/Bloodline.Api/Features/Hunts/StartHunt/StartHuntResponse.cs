@@ -8,5 +8,5 @@ public sealed record StartHuntResponse(
   int EnergyCost,
   long ExperienceReward,
   long GoldReward,
-  int RemainingAttempts
+  int RemainingEnergy
 );
