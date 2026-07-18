@@ -1,4 +1,5 @@
 using Bloodline.Infrastructure.Persistence;
+using Bloodline.Application.Identity.Abstractions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,19 @@ public sealed class BloodlineWebApplicationFactory(string connectionString) : We
       if (descriptor != null) services.Remove(descriptor);
 
       services.AddDbContext<BloodlineDbContext>(options => options.UseNpgsql(_connectionString));
+
+      var tokenBlacklistDescriptor = services.Single(d => d.ServiceType == typeof(ITokenBlacklist));
+      services.Remove(tokenBlacklistDescriptor);
+      services.AddSingleton<ITokenBlacklist, TestTokenBlacklist>();
     });
+  }
+
+  private sealed class TestTokenBlacklist : ITokenBlacklist
+  {
+    public Task BlacklistAsync(string jti, DateTimeOffset expiresAtUtc, CancellationToken cancellationToken) =>
+      Task.CompletedTask;
+
+    public Task<bool> IsBlacklistedAsync(string jti, CancellationToken cancellationToken) =>
+      Task.FromResult(false);
   }
 }
