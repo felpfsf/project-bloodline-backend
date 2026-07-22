@@ -30,12 +30,10 @@ public static class GetActiveHuntEndpoint
     if (!result.IsSuccess)
       return ToErrorResult(result);
 
-    var response = ToResponse(result);
-
     if (!result.HasActiveHunt)
       return Results.Ok(new GetActiveHuntResponse(null));
 
-    return Results.Ok(response);
+    return Results.Ok(ToResponse(result));
   }
 
   private static IResult ToErrorResult(GetActiveHuntResult result)
