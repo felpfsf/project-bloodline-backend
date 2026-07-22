@@ -70,8 +70,8 @@ public sealed class GetActiveHuntHandlerTests
     Assert.True(result.HasActiveHunt);
     Assert.Equal(hunt.Id, result.HuntId);
     Assert.Equal("shadow_hunt", result.DefinitionCode);
-    Assert.Equal(hunt.StartsAtUtc, result.StartedAtUtc);
-    Assert.Equal(startsAtUtc.AddSeconds(60), result.EndedAtUtc);
+    Assert.Equal(hunt.StartsAtUtc, result.StartsAtUtc);
+    Assert.Equal(startsAtUtc.AddSeconds(60), result.EndsAtUtc);
     Assert.Equal(10, result.EnergyCost);
     Assert.Equal(25, result.ExperienceReward);
     Assert.Equal(15, result.GoldReward);

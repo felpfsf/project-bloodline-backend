@@ -1,5 +1,6 @@
 using Bloodline.Application.Characters.CreateCharacter;
 using Bloodline.Application.Characters.GetCurrentCharacter;
+using Bloodline.Application.Hunts.CompleteHunt;
 using Bloodline.Application.Hunts.GetActiveHunt;
 using Bloodline.Application.Hunts.StartHunt;
 using Bloodline.Application.Identity.Login;
@@ -25,6 +26,7 @@ public static class DependencyInjection
 
     services.AddScoped<StartHuntHandler>();
     services.AddScoped<GetActiveHuntHandler>();
+    services.AddScoped<CompleteHuntHandler>();
 
     services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
     services.AddScoped<IValidator<LoginCommand>, LoginUserCommandValidator>();
