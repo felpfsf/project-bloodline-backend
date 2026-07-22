@@ -7,8 +7,8 @@ public sealed record GetActiveHuntResult
   private GetActiveHuntResult(
     Guid? huntId,
     string? definitionCode,
-    DateTimeOffset? startedAtUtc,
-    DateTimeOffset? endedAtUtc,
+    DateTimeOffset? startsAtUtc,
+    DateTimeOffset? endsAtUtc,
     int? energyCost,
     long? experienceReward,
     long? goldReward,
@@ -18,8 +18,8 @@ public sealed record GetActiveHuntResult
   {
     HuntId = huntId;
     DefinitionCode = definitionCode;
-    StartedAtUtc = startedAtUtc;
-    EndedAtUtc = endedAtUtc;
+    StartsAtUtc = startsAtUtc;
+    EndsAtUtc = endsAtUtc;
     EnergyCost = energyCost;
     ExperienceReward = experienceReward;
     GoldReward = goldReward;
@@ -29,8 +29,8 @@ public sealed record GetActiveHuntResult
 
   public Guid? HuntId { get; }
   public string? DefinitionCode { get; }
-  public DateTimeOffset? StartedAtUtc { get; }
-  public DateTimeOffset? EndedAtUtc { get; }
+  public DateTimeOffset? StartsAtUtc { get; }
+  public DateTimeOffset? EndsAtUtc { get; }
   public int? EnergyCost { get; }
   public long? ExperienceReward { get; }
   public long? GoldReward { get; }
@@ -44,8 +44,8 @@ public sealed record GetActiveHuntResult
   public static GetActiveHuntResult Success(
     Guid huntId,
     string definitionCode,
-    DateTimeOffset startedAtUtc,
-    DateTimeOffset endedAtUtc,
+    DateTimeOffset startsAtUtc,
+    DateTimeOffset endsAtUtc,
     int energyCost,
     long experienceReward,
     long goldReward
@@ -54,8 +54,8 @@ public sealed record GetActiveHuntResult
     return new GetActiveHuntResult(
       huntId,
       definitionCode,
-      startedAtUtc,
-      endedAtUtc,
+      startsAtUtc,
+      endsAtUtc,
       energyCost,
       experienceReward,
       goldReward,
@@ -69,8 +69,8 @@ public sealed record GetActiveHuntResult
     return new GetActiveHuntResult(
       huntId: null,
       definitionCode: null,
-      startedAtUtc: null,
-      endedAtUtc: null,
+      startsAtUtc: null,
+      endsAtUtc: null,
       energyCost: null,
       experienceReward: null,
       goldReward: null,
@@ -84,8 +84,8 @@ public sealed record GetActiveHuntResult
     return new GetActiveHuntResult(
       huntId: null,
       definitionCode: null,
-      startedAtUtc: null,
-      endedAtUtc: null,
+      startsAtUtc: null,
+      endsAtUtc: null,
       energyCost: null,
       experienceReward: null,
       goldReward: null,
