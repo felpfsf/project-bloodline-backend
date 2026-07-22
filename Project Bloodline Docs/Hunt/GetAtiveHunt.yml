@@ -1,0 +1,47 @@
+info:
+  name: GetAtiveHunt
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseUrl}}/hunts/active"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: example Active Hunt
+    request:
+      url: "{{baseUrl}}/hunts/active"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json; charset=utf-8
+        - name: date
+          value: Wed, 22 Jul 2026 04:02:34 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: json
+        data: |-
+          {
+            "activeHunt": {
+              "id": "02b919d2-bd93-49a3-9fa0-4b4eaf33d323",
+              "definitionCode": "shadow_hunt",
+              "startsAtUtc": "2026-07-15T04:30:27.285323+00:00",
+              "endsAtUtc": "2026-07-15T04:31:27.285323+00:00",
+              "energyCost": 10,
+              "experienceReward": 25,
+              "goldReward": 15
+            }
+          }

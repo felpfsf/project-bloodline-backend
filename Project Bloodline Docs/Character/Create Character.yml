@@ -13,9 +13,7 @@ http:
         "name": "Damon",
         "faction": "vampire"
       }
-  auth:
-    type: bearer
-    token: "{{bearerToken}}"
+  auth: inherit
 
 settings:
   encodeUrl: true

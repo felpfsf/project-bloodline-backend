@@ -6,12 +6,31 @@ info:
 http:
   method: POST
   url: "{{baseUrl}}/hunts"
-  auth:
-    type: bearer
-    token: "{{bearerToken}}"
+  auth: inherit
 
 settings:
   encodeUrl: true
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+examples:
+  - name: example Hunt Already Active
+    request:
+      url: "{{baseUrl}}/hunts"
+      method: POST
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Wed, 22 Jul 2026 04:02:30 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: '{"type":"https://httpstatuses.com/409","title":"Hunt already active","status":409,"detail":"The character already has an active hunt.","code":"hunt_already_active","traceId":"00-55413eaba332964efecb7625503808fd-326d4f8116250cfb-00"}'

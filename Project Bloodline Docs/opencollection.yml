@@ -14,6 +14,11 @@ config:
         password: ""
       bypassProxy: ""
 
+request:
+  auth:
+    type: bearer
+    token: "{{bearerToken}}"
+
 docs:
   content: |
     # Project Bloodline API
