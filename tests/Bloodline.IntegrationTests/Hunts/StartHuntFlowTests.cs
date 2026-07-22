@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Bloodline.Api.Features.Hunts.StartHunt;
 using Bloodline.IntegrationTests.Infrastructure;
@@ -20,7 +21,7 @@ public sealed class StartHuntFlowTests(PostgreSqlFixture fixture)
       characterName: TestAuthUtils.UniqueCharacterName("Hunt")
     );
 
-    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
       "Bearer", accessToken
     );
 
@@ -65,7 +66,7 @@ public sealed class StartHuntFlowTests(PostgreSqlFixture fixture)
 
     var accessToken = await TestAuthUtils.RegisterAndLoginAsync(client);
 
-    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
       "Bearer", accessToken
     );
 
@@ -92,7 +93,7 @@ public sealed class StartHuntFlowTests(PostgreSqlFixture fixture)
       characterName: TestAuthUtils.UniqueCharacterName("Hunt")
     );
 
-    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
       "Bearer", accessToken
     );
 
