@@ -1,5 +1,6 @@
 using Bloodline.Application.Characters.CreateCharacter;
 using Bloodline.Application.Characters.GetCurrentCharacter;
+using Bloodline.Application.Hunts.GetActiveHunt;
 using Bloodline.Application.Hunts.StartHunt;
 using Bloodline.Application.Identity.Login;
 using Bloodline.Application.Identity.Logout;
@@ -18,9 +19,12 @@ public static class DependencyInjection
     services.AddScoped<RegisterUserHandler>();
     services.AddScoped<LoginUserHandler>();
     services.AddScoped<LogoutHandler>();
+    
     services.AddScoped<CreateCharacterHandler>();
     services.AddScoped<GetCurrentCharacterHandler>();
+
     services.AddScoped<StartHuntHandler>();
+    services.AddScoped<GetActiveHuntHandler>();
 
     services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
     services.AddScoped<IValidator<LoginCommand>, LoginUserCommandValidator>();
