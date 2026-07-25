@@ -1,3 +1,4 @@
+using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Hunts.CompleteHunt;
 using Bloodline.Application.Tests.Characters.Fakes;
 using Bloodline.Application.Tests.Fakes;
@@ -214,5 +215,75 @@ public sealed class CompleteHuntHandlerTests
       unitOfWork,
       clock
     );
+  }
+
+  [Fact]
+  public async Task HandleAsync_Should_Return_Success_When_Another_Request_CompletedHuntFirst()
+  {
+    var userId = Guid.NewGuid();
+    var starsAtUtc = new DateTimeOffset(2026, 7, 22, 20, 0, 0, TimeSpan.Zero);
+    var completedAtUtc = starsAtUtc.AddSeconds(60);
+    var character = CreateCharacter(userId);
+    var staleHunt = Hunt.Start(
+      characterId: character.Id,
+      definitionCode: "shadow_hunt",
+      startsAtUtc: starsAtUtc,
+      duration: TimeSpan.FromSeconds(60),
+      energyCost: 10,
+      experienceReward: 25,
+      goldReward: 15
+    );
+
+    var persistedHunt = Hunt.Start(
+      characterId: character.Id,
+      definitionCode: "shadow_hunt",
+      startsAtUtc: starsAtUtc,
+      duration: TimeSpan.FromSeconds(60),
+      energyCost: 10,
+      experienceReward: 25,
+      goldReward: 15
+    );
+
+    persistedHunt.Complete(completedAtUtc);
+
+    var characterRepository = new FakeCharacterRepository
+    {
+      CharacterToReturn = character
+    };
+
+    var huntRepository = new FakeHuntRepository
+    {
+      HuntToReturn = staleHunt,
+      HuntSnapshotToReturn = persistedHunt
+    };
+
+    var unitOfWork = new FakeUnitOfWork
+    {
+      ConcurrencyConflictToThrow = new ConcurrencyConflictException(
+        "Concurrent completion detected. Another request has already completed the hunt."
+      )
+    };
+
+    var clock = new FakeClock
+    {
+      UtcNow = completedAtUtc
+    };
+
+    var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
+
+    var result = await handler.HandleAsync(
+      new CompleteHuntCommand(
+        UserId: userId,
+        HuntId: staleHunt.Id
+      ),
+      CancellationToken.None
+    );
+
+    Assert.True(result.IsSuccess);
+
+    Assert.Equal(completedAtUtc, persistedHunt.CompletedAtUtc);
+
+    Assert.Equal(1, unitOfWork.SaveChangesCallCount);
+    Assert.Equal(1, huntRepository.GetSnapshotCallCount);
   }
 }

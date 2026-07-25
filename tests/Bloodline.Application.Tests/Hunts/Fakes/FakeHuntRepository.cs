@@ -13,6 +13,8 @@ public sealed class FakeHuntRepository : IHuntRepository
   public Guid? RequestedHuntId { get; private set; }
   public Guid? RequestedHuntCharacterId { get; private set; }
   public Hunt? CreatedHunt { get; private set; }
+  public Hunt? HuntSnapshotToReturn { get; set; }
+  public int GetSnapshotCallCount { get; private set; }
 
   public Task CreateAsync(Hunt hunt, CancellationToken cancellationToken)
   {
@@ -35,6 +37,13 @@ public sealed class FakeHuntRepository : IHuntRepository
   public Task<Hunt?> GetByIdAndCharacterIdAsync(Guid huntId, Guid characterId, CancellationToken cancellationToken)
   {
     RequestedHuntId = huntId;
+    RequestedHuntCharacterId = characterId;
     return Task.FromResult(HuntToReturn);
+  }
+
+  public Task<Hunt?> GetSnapshotByIdAndCharacterIdAsync(Guid huntId, Guid characterId, CancellationToken cancellationToken)
+  {
+    GetSnapshotCallCount++;
+    return Task.FromResult(HuntSnapshotToReturn);
   }
 }

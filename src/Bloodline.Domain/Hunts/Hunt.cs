@@ -20,6 +20,8 @@ public sealed class Hunt
 
   public string DefinitionCode { get; private set; } = null!;
 
+  public int Version { get; private set; }
+
   private Hunt() { }
 
   private Hunt(
@@ -37,11 +39,15 @@ public sealed class Hunt
     CharacterId = characterId;
     DefinitionCode = definitionCode;
     Status = HuntStatus.Active;
+
     StartsAtUtc = startsAtUtc;
     EndsAtUtc = endsAtUtc;
+
     EnergyCost = energyCost;
     ExperienceReward = experienceReward;
     GoldReward = goldReward;
+
+    Version = 0;
   }
 
 
@@ -81,6 +87,7 @@ public sealed class Hunt
 
     Status = HuntStatus.Completed;
     CompletedAtUtc = completedAtUtc;
+    Version++;
   }
 
   private static void ValidateStartParameters(

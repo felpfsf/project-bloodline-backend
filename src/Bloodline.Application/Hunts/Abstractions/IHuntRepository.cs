@@ -9,4 +9,5 @@ public interface IHuntRepository
   Task<Hunt?> GetActiveByCharacterIdAsync(Guid characterId, CancellationToken cancellationToken);
   Task<Hunt?> GetByIdAndCharacterIdAsync(Guid huntId, Guid characterId, CancellationToken cancellationToken);
   Task CreateAsync(Hunt hunt, CancellationToken cancellationToken);
+  Task<Hunt?> GetSnapshotByIdAndCharacterIdAsync(Guid huntId, Guid characterId, CancellationToken cancellationToken);
 }

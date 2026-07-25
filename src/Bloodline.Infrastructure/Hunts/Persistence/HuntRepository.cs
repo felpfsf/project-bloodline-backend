@@ -54,5 +54,14 @@ public sealed class HuntRepository(BloodlineDbContext context) : IHuntRepository
     );
   }
 
-
+  public Task<Hunt?> GetSnapshotByIdAndCharacterIdAsync(Guid huntId, Guid characterId, CancellationToken cancellationToken)
+  {
+    return _dbContext.Hunts
+      .AsNoTracking()
+      .SingleOrDefaultAsync(
+        hunt => hunt.Id == huntId && 
+        hunt.CharacterId == characterId, 
+        cancellationToken
+      );
+  }
 }

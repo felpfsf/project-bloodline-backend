@@ -53,6 +53,11 @@ public sealed class HuntConfiguration : IEntityTypeConfiguration<Hunt>
       .HasColumnName("gold_reward")
       .IsRequired();
 
+    builder.Property(hunt => hunt.Version)
+    .HasColumnName("version")
+    .IsRequired()
+    .IsConcurrencyToken();
+
     builder.HasOne<Character>()
       .WithMany()
       .HasForeignKey(hunt => hunt.CharacterId)

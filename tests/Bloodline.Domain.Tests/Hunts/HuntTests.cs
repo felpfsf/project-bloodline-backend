@@ -27,6 +27,7 @@ public sealed class HuntTests
     hunt.EnergyCost.Should().Be(10);
     hunt.ExperienceReward.Should().Be(50);
     hunt.GoldReward.Should().Be(75);
+    Assert.Equal(0, hunt.Version);
   }
 
   [Fact]
@@ -51,6 +52,7 @@ public sealed class HuntTests
 
     hunt.Status.Should().Be(HuntStatus.Completed);
     hunt.CompletedAtUtc.Should().Be(completedAtUtc);
+    Assert.Equal(1, hunt.Version);
   }
 
   [Fact]
@@ -63,6 +65,7 @@ public sealed class HuntTests
 
     action.Should().Throw<InvalidOperationException>()
       .WithMessage("Cannot complete hunt before it ends.");
+    Assert.Equal(0, hunt.Version);
   }
 
   [Fact]

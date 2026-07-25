@@ -41,15 +41,7 @@ public sealed class CompleteHuntHandler(
       return CompleteHuntResult.Failure(CompleteHuntError.HuntNotFound);
 
     if (hunt.Status == HuntStatus.Completed)
-    {
-      return CompleteHuntResult.Success(
-        hunt.Id,
-        hunt.DefinitionCode,
-        hunt.StartsAtUtc,
-        hunt.ExperienceReward,
-        hunt.GoldReward
-      );
-    }
+      return BuildSuccessResult(hunt);
 
     var nowUtc = _clock.UtcNow;
 
@@ -63,7 +55,38 @@ public sealed class CompleteHuntHandler(
       hunt.GoldReward
     );
 
-    await _unitOfWork.SaveChangesAsync(cancellationToken);
+    try
+    {
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+    catch (ConcurrencyConflictException)
+    {
+      var persistedHunt = await _huntRepository.GetSnapshotByIdAndCharacterIdAsync(
+        hunt.Id,
+        character.Id,
+        cancellationToken
+      );
+
+      if (
+        persistedHunt is not null &&
+        persistedHunt.Status == HuntStatus.Completed &&
+        persistedHunt.CompletedAtUtc.HasValue
+      )
+      {
+        return BuildSuccessResult(hunt);
+      }
+      throw;
+    }
+
+    return BuildSuccessResult(hunt);
+  }
+
+  private static CompleteHuntResult BuildSuccessResult(Hunt hunt)
+  {
+    if (!hunt.CompletedAtUtc.HasValue)
+    {
+      throw new InvalidOperationException("A completed hunt must have a completion timestamp.");
+    }
 
     return CompleteHuntResult.Success(
       hunt.Id,
