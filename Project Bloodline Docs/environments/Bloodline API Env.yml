@@ -8,3 +8,5 @@ variables:
     value: felipe@email.com
   - name: password
     value: Password123
+  - name: huntId
+    value: ""

@@ -8,6 +8,14 @@ http:
   url: "{{baseUrl}}/hunts/active"
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.setEnvVar("huntId", res.body.activeHunt.id);
+        }
+
 settings:
   encodeUrl: true
   timeout: 0
