@@ -91,7 +91,7 @@ public sealed class CompleteHuntHandler(
     return CompleteHuntResult.Success(
       hunt.Id,
       hunt.DefinitionCode,
-      hunt.StartsAtUtc,
+      hunt.CompletedAtUtc.Value,
       hunt.ExperienceReward,
       hunt.GoldReward
     );

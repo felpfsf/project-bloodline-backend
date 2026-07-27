@@ -40,7 +40,7 @@ public sealed class CompleteHuntHandlerTests
     Assert.Equal(1, unitOfWork.SaveChangesCallCount);
     Assert.Equal(hunt.Id, result.HuntId);
     Assert.Equal("shadow_hunt", result.DefinitionCode);
-    Assert.Equal(startsAtUtc, result.StartsAtUtc);
+    Assert.Equal(clock.UtcNow, result.CompletedAtUtc);
     Assert.Equal(25, result.ExperienceReward);
     Assert.Equal(15, result.GoldReward);
   }

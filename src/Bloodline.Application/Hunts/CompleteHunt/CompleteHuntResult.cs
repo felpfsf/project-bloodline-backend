@@ -5,7 +5,7 @@ public sealed record CompleteHuntResult
   private CompleteHuntResult(
     Guid? huntId,
     string? definitionCode,
-    DateTimeOffset? startsAtUtc,
+    DateTimeOffset? completedAtUtc,
     long? experienceReward,
     long? goldReward,
     CompleteHuntError? error
@@ -13,7 +13,7 @@ public sealed record CompleteHuntResult
   {
     HuntId = huntId;
     DefinitionCode = definitionCode;
-    StartsAtUtc = startsAtUtc;
+    CompletedAtUtc = completedAtUtc;
     ExperienceReward = experienceReward;
     GoldReward = goldReward;
     Error = error;
@@ -21,7 +21,7 @@ public sealed record CompleteHuntResult
 
   public Guid? HuntId { get; }
   public string? DefinitionCode { get; }
-  public DateTimeOffset? StartsAtUtc { get; }
+  public DateTimeOffset? CompletedAtUtc { get; }
   public long? ExperienceReward { get; }
   public long? GoldReward { get; }
 
@@ -32,13 +32,13 @@ public sealed record CompleteHuntResult
   public static CompleteHuntResult Success(
     Guid huntId,
     string definitionCode,
-    DateTimeOffset startsAtUtc,
+    DateTimeOffset completedAtUtc,
     long experienceReward,
     long goldReward
   ) => new(
     huntId: huntId,
     definitionCode: definitionCode,
-    startsAtUtc: startsAtUtc,
+    completedAtUtc: completedAtUtc,
     experienceReward: experienceReward,
     goldReward: goldReward,
     error: null
@@ -47,7 +47,7 @@ public sealed record CompleteHuntResult
   public static CompleteHuntResult Failure(CompleteHuntError error) => new(
     huntId: null,
     definitionCode: null,
-    startsAtUtc: null,
+    completedAtUtc: null,
     experienceReward: null,
     goldReward: null,
     error: error
