@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Bloodline.Infrastructure.Persistence;
 using Bloodline.Api.Features.Characters;
 using Bloodline.Api.Features.Hunts;
+using Bloodline.Api.Common.Http;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
 });
 
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddOpenApi();
 
@@ -100,22 +102,6 @@ app.UseSerilogRequestLogging();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler(errorApp =>
-    {
-        errorApp.Run(async context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new
-            {
-                error = "An unexpected error occurred. Please try again later."
-            });
-        });
-    });
-}
 
 if (app.Environment.IsDevelopment())
 {

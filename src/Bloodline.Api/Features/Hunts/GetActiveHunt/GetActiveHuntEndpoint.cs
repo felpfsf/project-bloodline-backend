@@ -15,12 +15,7 @@ public static class GetActiveHuntEndpoint
     var userIdClaim = user.FindFirstValue("sub");
 
     if (!Guid.TryParse(userIdClaim, out var userId))
-    {
-      return Results.Problem(
-        statusCode: StatusCodes.Status401Unauthorized,
-        title: "Invalid authentication token."
-      );
-    }
+      return ProblemDetailsExtensions.UnauthorizedProblem();
 
     var result = await handler.HandleAsync(
       new GetActiveHuntQuery(userId),
@@ -46,11 +41,7 @@ public static class GetActiveHuntEndpoint
           detail: "The authenticated user does not have a character yet.",
           code: GetActiveHuntHttpCodes.CharacterNotFound
         ),
-      _ => ProblemDetailsExtensions.InternalServerError(
-        title: "Unexpected error",
-        detail: "An unexpected error occurred while processing the request.",
-        code: "unexpected_error"
-      )
+      _ => ProblemDetailsExtensions.UnexpectedError()
     };
   }
 

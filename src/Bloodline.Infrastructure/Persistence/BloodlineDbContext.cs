@@ -13,15 +13,14 @@ public sealed class BloodlineDbContext(DbContextOptions<BloodlineDbContext> opti
 
   public DbSet<Hunt> Hunts => Set<Hunt>();
 
-  public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
     try
     {
-      return base.SaveChangesAsync(cancellationToken);
+      return await base.SaveChangesAsync(cancellationToken);
     }
     catch (DbUpdateConcurrencyException exception)
     {
-
       throw new ConcurrencyConflictException(
         "A concurrent persistence update was detected. The entity has been modified by another process.",
         exception
@@ -29,7 +28,10 @@ public sealed class BloodlineDbContext(DbContextOptions<BloodlineDbContext> opti
     }
     catch (DbUpdateException exception)
     {
-      throw new Exception("An error occurred while saving changes to the database.", exception);
+      throw new PersistenceException(
+        "A persistence update failed.",
+        exception
+      );
     }
   }
 

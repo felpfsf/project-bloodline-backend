@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Bloodline.Api.Common.Http;
 using Bloodline.Application.Identity.Logout;
 
 namespace Bloodline.Api.Features.Identity.Logout;
@@ -15,21 +16,11 @@ public static class LogoutEndpoint
     var jti = user.FindFirstValue(JwtRegisteredClaimNames.Jti);
 
     if (string.IsNullOrEmpty(jti))
-    {
-      return Results.Problem(
-        statusCode: StatusCodes.Status401Unauthorized,
-        title: "Invalid authentication token."
-      );
-    }
+      return ProblemDetailsExtensions.UnauthorizedProblem();
 
     var expClaim = user.FindFirstValue(JwtRegisteredClaimNames.Exp);
     if (!long.TryParse(expClaim, out var expUnix))
-    {
-      return Results.Problem(
-        statusCode: StatusCodes.Status401Unauthorized,
-        title: "Invalid authentication token."
-      );
-    }
+      return ProblemDetailsExtensions.UnauthorizedProblem();
 
     var expiresAtUtc = DateTimeOffset.FromUnixTimeSeconds(expUnix);
     var command = new LogoutCommand(jti, expiresAtUtc);

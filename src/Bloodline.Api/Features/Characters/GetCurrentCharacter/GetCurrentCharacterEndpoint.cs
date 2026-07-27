@@ -16,12 +16,7 @@ public static class GetCurrentCharacterEndpoint
     var userIdClaim = user.FindFirstValue("sub");
 
     if (!Guid.TryParse(userIdClaim, out var userId))
-    {
-      return Results.Problem(
-        statusCode: StatusCodes.Status401Unauthorized,
-        title: "Invalid authentication token."
-      );
-    }
+      return ProblemDetailsExtensions.UnauthorizedProblem();
 
     var result = await handler.HandleAsync(
       new GetCurrentCharacterQuery(userId),

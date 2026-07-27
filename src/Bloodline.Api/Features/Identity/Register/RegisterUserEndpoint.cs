@@ -28,10 +28,7 @@ public static class RegisterUserEndpoint
           detail: "A user with the provided email already exists.",
           code: RegisterUserHttpCodes.EmailAlreadyExists
         ),
-        _ => Results.Problem(
-          statusCode: StatusCodes.Status500InternalServerError,
-          title: "Unexpected registration error"
-        )
+        _ => ProblemDetailsExtensions.UnexpectedError()
 
       };
     }

@@ -31,13 +31,7 @@ public sealed class CompleteHuntHandlerTests
       UtcNow = startsAtUtc.AddSeconds(60)
     };
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
-    var result = await handler.HandleAsync(
-      new CompleteHuntCommand(
-        UserId: userId,
-        HuntId: hunt.Id
-      ),
-      CancellationToken.None
-    );
+    var result = await CompleteHuntAsync(handler, userId, hunt.Id);
     Assert.True(result.IsSuccess);
     Assert.Equal(HuntStatus.Completed, hunt.Status);
     Assert.Equal(clock.UtcNow, hunt.CompletedAtUtc);
@@ -72,13 +66,7 @@ public sealed class CompleteHuntHandlerTests
       UtcNow = startsAtUtc.AddSeconds(58)
     };
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
-    var result = await handler.HandleAsync(
-      new CompleteHuntCommand(
-        UserId: userId,
-        HuntId: hunt.Id
-      ),
-      CancellationToken.None
-    );
+    var result = await CompleteHuntAsync(handler, userId, hunt.Id);
     Assert.False(result.IsSuccess);
     Assert.Equal(CompleteHuntError.HuntNotFinishedYet, result.Error);
     Assert.Equal(HuntStatus.Active, hunt.Status);
@@ -108,13 +96,7 @@ public sealed class CompleteHuntHandlerTests
       UtcNow = startsAtUtc.AddSeconds(60)
     };
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
-    var result = await handler.HandleAsync(
-      new CompleteHuntCommand(
-        UserId: userId,
-        HuntId: hunt.Id
-      ),
-      CancellationToken.None
-    );
+    var result = await CompleteHuntAsync(handler, userId, hunt.Id);
     Assert.True(result.IsSuccess);
     Assert.Equal(HuntStatus.Completed, hunt.Status);
     Assert.Equal(clock.UtcNow, hunt.CompletedAtUtc);
@@ -130,13 +112,7 @@ public sealed class CompleteHuntHandlerTests
     var unitOfWork = new FakeUnitOfWork();
     var clock = new FakeClock();
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
-    var result = await handler.HandleAsync(
-      new CompleteHuntCommand(
-        UserId: userId,
-        HuntId: huntId
-      ),
-      CancellationToken.None
-    );
+    var result = await CompleteHuntAsync(handler, userId, huntId);
 
     Assert.False(result.IsSuccess);
     Assert.Equal(CompleteHuntError.CharacterNotFound, result.Error);
@@ -163,13 +139,7 @@ public sealed class CompleteHuntHandlerTests
 
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
 
-    var result = await handler.HandleAsync(
-      new CompleteHuntCommand(
-        UserId: userId,
-        HuntId: huntId
-      ),
-      CancellationToken.None
-    );
+    var result = await CompleteHuntAsync(handler, userId, huntId);
 
     Assert.False(result.IsSuccess);
     Assert.Equal(CompleteHuntError.HuntNotFound, result.Error);
@@ -214,6 +184,21 @@ public sealed class CompleteHuntHandlerTests
       huntRepository,
       unitOfWork,
       clock
+    );
+  }
+
+  private static Task<CompleteHuntResult> CompleteHuntAsync(
+    CompleteHuntHandler handler,
+    Guid userId,
+    Guid huntId
+  )
+  {
+    return handler.HandleAsync(
+      new CompleteHuntCommand(
+        UserId: userId,
+        HuntId: huntId
+      ),
+      CancellationToken.None
     );
   }
 
@@ -271,13 +256,7 @@ public sealed class CompleteHuntHandlerTests
 
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
 
-    var result = await handler.HandleAsync(
-      new CompleteHuntCommand(
-        UserId: userId,
-        HuntId: staleHunt.Id
-      ),
-      CancellationToken.None
-    );
+    var result = await CompleteHuntAsync(handler, userId, staleHunt.Id);
 
     Assert.True(result.IsSuccess);
 

@@ -15,12 +15,7 @@ public static class StartHuntEndpoint
     var userIdClaim = user.FindFirstValue("sub");
 
     if (!Guid.TryParse(userIdClaim, out var userId))
-    {
-      return Results.Problem(
-        statusCode: StatusCodes.Status401Unauthorized,
-        title: "Invalid authentication token."
-      );
-    }
+      return ProblemDetailsExtensions.UnauthorizedProblem();
 
     var command = new StartHuntCommand(userId);
 
@@ -63,11 +58,7 @@ public static class StartHuntEndpoint
           detail: "The character does not have enough energy to start a hunt.",
           code: StartHuntHttpCodes.NotEnoughEnergy
         ),
-      _ => ProblemDetailsExtensions.InternalServerError(
-        title: "Unexpected error",
-        detail: "An unexpected error occurred while starting the hunt.",
-        code: "unexpected_error"
-      )
+      _ => ProblemDetailsExtensions.UnexpectedError()
     };
   }
 

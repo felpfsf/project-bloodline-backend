@@ -52,31 +52,16 @@ public static class ProblemDetailsExtensions
     string code
   )
   {
-    return Results.Problem(
-      statusCode: StatusCodes.Status409Conflict,
-      title: title,
-      detail: detail,
-      type: "https://httpstatuses.com/409", // https://bloodline.com/probs/conflict
-      extensions: new Dictionary<string, object?>
-      {
-        ["code"] = code,
-        ["traceId"] = Activity.Current?.Id
-      }
-    );
+    return Problem(StatusCodes.Status409Conflict, title, detail, code);
   }
 
-  public static IResult UnauthorizedProblem()
+  public static IResult UnauthorizedProblem(string detail = "The provided authentication token is invalid.")
   {
-    return Results.Problem(
-      statusCode: StatusCodes.Status401Unauthorized,
-      title: "Invalid credentials",
-      detail: "The provided credentials are invalid. Please check your email and password and try again.",
-      type: "https://httpstatuses.com/401", // https://bloodline.com/probs/unauthorized
-      extensions: new Dictionary<string, object?>
-      {
-        ["code"] = "invalid_credentials",
-        ["traceId"] = Activity.Current?.Id
-      }
+    return Problem(
+      StatusCodes.Status401Unauthorized,
+      "Unauthorized",
+      detail,
+      "unauthorized"
     );
   }
 
@@ -86,17 +71,7 @@ public static class ProblemDetailsExtensions
     string code
   )
   {
-    return Results.Problem(
-      statusCode: StatusCodes.Status404NotFound,
-      title: title,
-      detail: detail,
-      type: "https://httpstatuses.com/404", // https://bloodline.com/probs/not_found
-      extensions: new Dictionary<string, object?>
-      {
-        ["code"] = code,
-        ["traceId"] = Activity.Current?.Id
-      }
-    );
+    return Problem(StatusCodes.Status404NotFound, title, detail, code);
   }
 
   public static IResult InternalServerError(
@@ -105,15 +80,35 @@ public static class ProblemDetailsExtensions
     string code
   )
   {
+    return Problem(StatusCodes.Status500InternalServerError, title, detail, code);
+  }
+
+  public static IResult UnexpectedError()
+  {
+    return InternalServerError(
+      "Unexpected error",
+      "An unexpected error occurred. Please try again later.",
+      "internal_server_error"
+    );
+  }
+
+  public static IResult Problem(
+    int statusCode,
+    string title,
+    string detail,
+    string code,
+    string? traceId = null
+  )
+  {
     return Results.Problem(
-      statusCode: StatusCodes.Status500InternalServerError,
+      statusCode: statusCode,
       title: title,
       detail: detail,
-      type: "https://httpstatuses.com/500", // https://bloodline.com/probs/internal_server_error
+      type: $"https://httpstatuses.com/{statusCode}",
       extensions: new Dictionary<string, object?>
       {
         ["code"] = code,
-        ["traceId"] = Activity.Current?.Id
+        ["traceId"] = traceId ?? Activity.Current?.Id
       }
     );
   }

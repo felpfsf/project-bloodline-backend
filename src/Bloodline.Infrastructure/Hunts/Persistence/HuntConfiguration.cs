@@ -54,9 +54,9 @@ public sealed class HuntConfiguration : IEntityTypeConfiguration<Hunt>
       .IsRequired();
 
     builder.Property(hunt => hunt.Version)
-    .HasColumnName("version")
-    .IsRequired()
-    .IsConcurrencyToken();
+      .HasColumnName("version")
+      .IsRequired()
+      .IsConcurrencyToken();
 
     builder.HasOne<Character>()
       .WithMany()

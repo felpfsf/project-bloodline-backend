@@ -17,12 +17,7 @@ public static class CreateCharacterEndpoint
     var userIdClaim = user.FindFirstValue("sub");
 
     if (!Guid.TryParse(userIdClaim, out var userId))
-    {
-      return Results.Problem(
-        statusCode: StatusCodes.Status401Unauthorized,
-        title: "Invalid authentication token."
-      );
-    }
+      return ProblemDetailsExtensions.UnauthorizedProblem();
 
     var faction = TryParseFaction(request.Faction, out var parsedFaction) ? parsedFaction : (Faction)0;
     var command = new CreateCharacterCommand(
@@ -56,10 +51,7 @@ public static class CreateCharacterEndpoint
         detail: "The character name is already taken.",
         code: CreateCharacterHttpCodes.CharacterNameAlreadyTaken
       ),
-      _ => Results.Problem(
-        statusCode: StatusCodes.Status500InternalServerError,
-        title: "Unexpected character creation error"
-      )
+      _ => ProblemDetailsExtensions.UnexpectedError()
     };
   }
 

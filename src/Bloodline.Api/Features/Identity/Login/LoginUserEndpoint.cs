@@ -23,11 +23,13 @@ public static class LoginUserEndpoint
       return result.Error switch
       {
         LoginUserError.ValidationFailed => result.ValidationErrors.ValidationProblem(),
-        LoginUserError.InvalidCredentials => ProblemDetailsExtensions.UnauthorizedProblem(),
-        _ => Results.Problem(
-          statusCode: StatusCodes.Status500InternalServerError,
-          title: "An unexpected login error occurred."
-        )
+        LoginUserError.InvalidCredentials => ProblemDetailsExtensions.Problem(
+          StatusCodes.Status401Unauthorized,
+          "Invalid credentials",
+          "The provided credentials are invalid. Please check your email and password and try again.",
+          "invalid_credentials"
+        ),
+        _ => ProblemDetailsExtensions.UnexpectedError()
       };
     }
 
