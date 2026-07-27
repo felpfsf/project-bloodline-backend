@@ -15,12 +15,21 @@ public static class CharacterEndpoints
     group.MapPost(
       "/",
       CreateCharacterEndpoint.HandleAsync
-    );
+    )
+    .WithName("CreateCharacter")
+    .Accepts<CreateCharacterRequest>("application/json")
+    .Produces<CreateCharacterResponse>(StatusCodes.Status201Created)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status409Conflict);
 
     group.MapGet(
       "/me",
       GetCurrentCharacterEndpoint.HandleAsync
-    );
+    )
+    .WithName("GetCurrentCharacter")
+    .Produces<GetCurrentCharacterResponse>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
     return endpoints;
   }
