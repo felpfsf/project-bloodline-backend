@@ -3,8 +3,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Bloodline.Api.Features.Characters.GetCurrentCharacter;
 using Bloodline.Api.Features.Hunts.CompleteHunt;
+using Bloodline.Api.Features.Hunts.GetActiveHunt;
 using Bloodline.Api.Features.Hunts.StartHunt;
+using Bloodline.Domain.Hunts;
 using Bloodline.IntegrationTests.Infrastructure;
+using Bloodline.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Bloodline.IntegrationTests.Hunts;
 
@@ -12,6 +17,51 @@ namespace Bloodline.IntegrationTests.Hunts;
 public sealed class CompleteHuntFlowTests(PostgreSqlFixture fixture)
 {
   private readonly BloodlineWebApplicationFactory _factory = fixture.Factory;
+
+  [Fact]
+  public async Task CompleteHunt_Should_Return_Unauthorized_When_Token_Is_Missing()
+  {
+    var client = _factory.CreateClient();
+
+    var response = await client.PostAsync($"api/hunts/{Guid.NewGuid()}/complete", content: null);
+
+    Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+  }
+
+  [Fact]
+  public async Task CompleteHunt_Should_Return_CharacterNotFound_When_Authenticated_User_Has_No_Character()
+  {
+    var client = _factory.CreateClient();
+    var accessToken = await TestAuthUtils.RegisterAndLoginAsync(client);
+
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+    var response = await client.PostAsync($"api/hunts/{Guid.NewGuid()}/complete", content: null);
+
+    await AssertProblemAsync(response, HttpStatusCode.NotFound, "character_not_found");
+  }
+
+  [Fact]
+  public async Task CompleteHunt_Should_Return_HuntNotFound_When_Hunt_Does_Not_Exist()
+  {
+    var client = await CreateAuthenticatedClientAsync("MissingHunt");
+
+    var response = await client.PostAsync($"api/hunts/{Guid.NewGuid()}/complete", content: null);
+
+    await AssertProblemAsync(response, HttpStatusCode.NotFound, "hunt_not_found");
+  }
+
+  [Fact]
+  public async Task CompleteHunt_Should_Return_HuntNotFound_When_Hunt_Belongs_To_Another_Character()
+  {
+    var ownerClient = await CreateAuthenticatedClientAsync("HuntOwner");
+    var startedHunt = await StartHuntAsync(ownerClient);
+    var otherClient = await CreateAuthenticatedClientAsync("OtherChar");
+
+    var response = await otherClient.PostAsync($"api/hunts/{startedHunt.HuntId}/complete", content: null);
+
+    await AssertProblemAsync(response, HttpStatusCode.NotFound, "hunt_not_found");
+  }
 
   [Fact]
   public async Task CompleteHunt_Should_Complete_Hunt_And_Reward_Character_When_End_Time_Has_Arrived()
@@ -33,10 +83,25 @@ public sealed class CompleteHuntFlowTests(PostgreSqlFixture fixture)
     Assert.Equal(25, completedHunt.ExperienceReward);
     Assert.Equal(15, completedHunt.GoldReward);
 
+    var persistedHunt = await GetHuntAsync(startedHunt.HuntId);
+
+    Assert.Equal(HuntStatus.Completed, persistedHunt.Status);
+    Assert.Equal(startedHunt.EndsAtUtc, persistedHunt.CompletedAtUtc);
+    Assert.Equal(1, persistedHunt.Version);
+
     var character = await GetCurrentCharacterAsync(client);
 
     Assert.Equal(25, character.Experience);
     Assert.Equal(15, character.Gold);
+
+    var activeHuntResponse = await client.GetAsync("api/hunts/active");
+
+    Assert.Equal(HttpStatusCode.OK, activeHuntResponse.StatusCode);
+
+    var activeHunt = await activeHuntResponse.Content.ReadFromJsonAsync<GetActiveHuntResponse>();
+
+    Assert.NotNull(activeHunt);
+    Assert.Null(activeHunt!.ActiveHunt);
   }
 
   [Fact]
@@ -91,7 +156,7 @@ public sealed class CompleteHuntFlowTests(PostgreSqlFixture fixture)
 
     var response = await client.PostAsync($"api/hunts/{startedHunt.HuntId}/complete", content: null);
 
-    Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    await AssertProblemAsync(response, HttpStatusCode.Conflict, "hunt_not_finished_yet");
   }
 
   private async Task<HttpClient> CreateAuthenticatedClientAsync(string characterNamePrefix)
@@ -134,4 +199,30 @@ public sealed class CompleteHuntFlowTests(PostgreSqlFixture fixture)
 
     return character!;
   }
+
+  private async Task<Hunt> GetHuntAsync(Guid huntId)
+  {
+    using var scope = _factory.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<BloodlineDbContext>();
+
+    return await dbContext.Hunts
+      .AsNoTracking()
+      .SingleAsync(hunt => hunt.Id == huntId);
+  }
+
+  private static async Task AssertProblemAsync(
+    HttpResponseMessage response,
+    HttpStatusCode expectedStatusCode,
+    string expectedCode
+  )
+  {
+    Assert.Equal(expectedStatusCode, response.StatusCode);
+
+    var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsResponse>();
+
+    Assert.NotNull(problem);
+    Assert.Equal(expectedCode, problem!.Code);
+  }
+
+  private sealed record ProblemDetailsResponse(string? Code);
 }
