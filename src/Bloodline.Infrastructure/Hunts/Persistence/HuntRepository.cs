@@ -37,7 +37,6 @@ public sealed class HuntRepository(BloodlineDbContext context) : IHuntRepository
   public Task<Hunt?> GetByIdAndCharacterIdAsync(Guid huntId, Guid characterId, CancellationToken cancellationToken)
   {
     return _dbContext.Hunts
-      .AsNoTracking()
       .SingleOrDefaultAsync(
         hunt =>
           hunt.Id == huntId &&
@@ -59,8 +58,8 @@ public sealed class HuntRepository(BloodlineDbContext context) : IHuntRepository
     return _dbContext.Hunts
       .AsNoTracking()
       .SingleOrDefaultAsync(
-        hunt => hunt.Id == huntId && 
-        hunt.CharacterId == characterId, 
+        hunt => hunt.Id == huntId &&
+        hunt.CharacterId == characterId,
         cancellationToken
       );
   }
