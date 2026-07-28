@@ -47,3 +47,25 @@ examples:
             "experienceReward": 25,
             "goldReward": 15
           }
+  - name: example Hunt not Finished Yet
+    request:
+      url: "{{baseUrl}}/hunts/{{huntId}}/complete"
+      method: POST
+      body:
+        type: json
+        data: ""
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: date
+          value: Tue, 28 Jul 2026 03:29:48 GMT
+        - name: server
+          value: Kestrel
+        - name: transfer-encoding
+          value: chunked
+      body:
+        type: text
+        data: '{"type":"https://httpstatuses.com/409","title":"Hunt not finished yet","status":409,"detail":"The hunt is still in progress and cannot be completed yet.","code":"hunt_not_finished_yet","traceId":"00-39ca4e108225d619ef7ff3cad452f6be-95de10f7f776e48c-00"}'
