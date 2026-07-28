@@ -251,7 +251,7 @@ public sealed class CompleteHuntHandlerTests
 
     var clock = new FakeClock
     {
-      UtcNow = completedAtUtc
+      UtcNow = completedAtUtc.AddSeconds(1)
     };
 
     var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock);
@@ -261,6 +261,7 @@ public sealed class CompleteHuntHandlerTests
     Assert.True(result.IsSuccess);
 
     Assert.Equal(completedAtUtc, persistedHunt.CompletedAtUtc);
+    Assert.Equal(completedAtUtc, result.CompletedAtUtc);
 
     Assert.Equal(1, unitOfWork.SaveChangesCallCount);
     Assert.Equal(1, huntRepository.GetSnapshotCallCount);

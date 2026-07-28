@@ -73,7 +73,7 @@ public sealed class CompleteHuntHandler(
         persistedHunt.CompletedAtUtc.HasValue
       )
       {
-        return BuildSuccessResult(hunt);
+        return BuildSuccessResult(persistedHunt);
       }
       throw;
     }
