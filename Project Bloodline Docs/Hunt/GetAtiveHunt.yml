@@ -12,7 +12,7 @@ runtime:
   scripts:
     - type: after-response
       code: |-
-        if (res.status === 200) {
+        if (res.status === 200 && res.body.activeHunt) {
           bru.setEnvVar("huntId", res.body.activeHunt.id);
         }
 
