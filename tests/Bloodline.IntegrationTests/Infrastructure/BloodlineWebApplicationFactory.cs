@@ -4,12 +4,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Bloodline.Application.Common.Time;
 
 namespace Bloodline.IntegrationTests.Infrastructure;
 
 public sealed class BloodlineWebApplicationFactory(string connectionString) : WebApplicationFactory<Program>
 {
   private readonly string _connectionString = connectionString;
+
+  public IntegrationTestClock TestClock { get; } = new();
 
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
@@ -25,6 +29,10 @@ public sealed class BloodlineWebApplicationFactory(string connectionString) : We
       var tokenBlacklistDescriptor = services.Single(d => d.ServiceType == typeof(ITokenBlacklist));
       services.Remove(tokenBlacklistDescriptor);
       services.AddSingleton<ITokenBlacklist, TestTokenBlacklist>();
+
+      services.RemoveAll<IClock>();
+
+      services.AddSingleton<IClock>(TestClock);
     });
   }
 

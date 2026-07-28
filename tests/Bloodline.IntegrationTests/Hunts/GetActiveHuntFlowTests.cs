@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using Bloodline.Api.Features.Hunts.GetActiveHunt;
 using Bloodline.IntegrationTests.Infrastructure;
 
-namespace Bloodline.IntegrationTests.Hunts.GetActiveHunt;
+namespace Bloodline.IntegrationTests.Hunts;
 
 [Collection(PostgreSqlCollection.Name)]
 public sealed class GetActiveHuntFlowTests(PostgreSqlFixture fixture)
