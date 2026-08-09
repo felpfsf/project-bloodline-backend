@@ -114,6 +114,130 @@ public sealed class CharacterTests
     );
   }
 
+  [Fact]
+  public void Received_Experience_Should_Increase_Character_Experience()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(50);
+
+    // Assert
+    Assert.Equal(50, character.Experience);
+  }
+
+  [Fact]
+  public void Received_Experience_Should_Level_Up_When_Experience_Reaches_Threshold()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(100);
+
+    // Assert
+    Assert.Equal(100, character.Experience);
+    Assert.Equal(2, character.Level);
+  }
+
+  [Fact]
+  public void Received_Experience_Should_Not_Level_Up_When_Experience_Is_Below_Threshold()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(50);
+
+    // Assert
+    Assert.Equal(50, character.Experience);
+    Assert.Equal(1, character.Level);
+  }
+
+  [Fact]
+  public void Received_Experience_Should_Allow_Multiple_Level_Ups()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(600);
+
+    // Assert
+    Assert.Equal(600, character.Experience);
+    Assert.Equal(4, character.Level);
+  }
+
+  [Fact]
+  public void Received_Experience_Should_Accumulate_Experience_Across_Multiple_Rewards()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(50);
+    character.ReceivedExperience(30);
+    character.ReceivedExperience(20);
+
+    // Assert
+    Assert.Equal(100, character.Experience);
+    Assert.Equal(2, character.Level);
+  }
+
+  [Fact]
+  public void Received_Experience_Should_Throw_When_Experience_Is_Negative()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act & Assert
+    Assert.Throws<ArgumentOutOfRangeException>(() => character.ReceivedExperience(-100));
+  }
+
+  [Theory]
+  [MemberData(nameof(ReceivedExperienceCases))]
+  public void Received_Experience_Should_Update_Experience_And_Level_Correctly(long gainedExperience, long expectedExperience, int expectedLevel)
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(gainedExperience);
+
+    // Assert
+    Assert.Equal(expectedExperience, character.Experience);
+    Assert.Equal(expectedLevel, character.Level);
+  }
+
+  [Fact]
+  public void ReceivedExperience_Should_Accumulate_Across_Multiple_Calls()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceivedExperience(50);
+    character.ReceivedExperience(30);
+    character.ReceivedExperience(20);
+
+    // Assert
+    Assert.Equal(100, character.Experience);
+    Assert.Equal(2, character.Level);
+  }
+
+
+
+  public static TheoryData<long, long, int> ReceivedExperienceCases => new()
+  {
+    {50L, 50L, 1}, // bellow lvl 2
+    {99L, 99L, 1}, // lower border
+    {100L, 100L, 2}, // lvl 2
+    {299L, 299L, 2}, // bellow lvl 3
+    {300L, 300L, 3}, // lvl 3
+    {600L, 600L, 4} // multiple level ups
+  };
+
   private static Character CreateCharacter()
   {
     return Character.Create(

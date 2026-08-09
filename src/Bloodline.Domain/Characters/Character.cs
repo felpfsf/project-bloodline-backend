@@ -106,6 +106,25 @@ public sealed class Character
     }
     Energy -= amount;
   }
+
+  public void ReceivedExperience(long experience)
+  {
+    if (experience < 0)
+    {
+      throw new ArgumentOutOfRangeException(
+        nameof(experience),
+        "Experience amount must be greater than or equal to zero."
+      );
+    }
+
+    Experience += experience;
+
+    while (Experience >= CharacterProgression.ExperienceRequiredForNextLevel(Level + 1))
+    {
+      Level++;
+    }
+  }
+
   public void ReceiveHuntRewards(long experience, long gold)
   {
     if (experience < 0)
