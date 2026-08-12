@@ -86,11 +86,27 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceiveHuntRewards(100, 0);
+    character.ReceiveHuntRewards(100, 50);
 
     // Assert
     Assert.Equal(100, character.Experience);
     Assert.Equal(0, character.Gold);
+    Assert.Equal(2, character.Level);
+  }
+
+  [Fact]
+  public void ReceiveHuntReward_Should_Allow_Multiple_Level_Ups()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceiveHuntRewards(600, 50);
+
+    // Assert
+    Assert.Equal(600, character.Experience);
+    Assert.Equal(50, character.Gold);
+    Assert.Equal(4, character.Level);
   }
 
   [Fact]
