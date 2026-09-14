@@ -93,6 +93,7 @@ public sealed class CompleteHuntFlowTests(PostgreSqlFixture fixture)
 
     Assert.Equal(25, character.Experience);
     Assert.Equal(15, character.Gold);
+    Assert.Equal(1, character.Level);
 
     var activeHuntResponse = await client.GetAsync("api/hunts/active");
 

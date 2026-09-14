@@ -86,7 +86,7 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceiveHuntRewards(100, 50);
+    character.ReceiveHuntRewards(100, 0);
 
     // Assert
     Assert.Equal(100, character.Experience);
