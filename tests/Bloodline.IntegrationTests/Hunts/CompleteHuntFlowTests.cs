@@ -160,6 +160,36 @@ public sealed class CompleteHuntFlowTests(PostgreSqlFixture fixture)
     await AssertProblemAsync(response, HttpStatusCode.Conflict, "hunt_not_finished_yet");
   }
 
+  [Fact]
+  public async Task CompleteHunt_Should_Level_Up_Character_After_Reaching_Experience_Threshold()
+  {
+    // Arrange
+    var client = await CreateAuthenticatedClientAsync("LevelUpHunt");
+
+    // Act
+    for (var i = 0; i < 4; i++)
+    {
+      var startedHunt = await StartHuntAsync(client);
+
+      _factory.TestClock.UtcNow = startedHunt.EndsAtUtc;
+
+      var response = await client.PostAsync(
+        $"api/hunts/{startedHunt.HuntId}/complete",
+        content: null
+      );
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    // Assert
+    var character = await GetCurrentCharacterAsync(client);
+
+    Assert.Equal(100, character.Experience);
+    Assert.Equal(2, character.Level);
+    Assert.Equal(60, character.Energy);
+    Assert.Equal(60, character.Gold);
+  }
+
   private async Task<HttpClient> CreateAuthenticatedClientAsync(string characterNamePrefix)
   {
     _factory.TestClock.UtcNow = new DateTimeOffset(2026, 7, 27, 0, 0, 0, TimeSpan.Zero);
