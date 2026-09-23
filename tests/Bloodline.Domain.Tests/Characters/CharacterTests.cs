@@ -65,60 +65,6 @@ public sealed class CharacterTests
     Assert.False(result);
   }
 
-  [Fact]
-  public void ReceiveHuntReward_Should_Increase_Character_Experience_And_Gold()
-  {
-    // Arrange
-    var character = CreateCharacter();
-
-    // Act
-    character.ReceiveHuntRewards(100, 50);
-
-    // Assert
-    Assert.Equal(100, character.Experience);
-    Assert.Equal(50, character.Gold);
-  }
-
-  [Fact]
-  public void ReceiveHuntReward_Should_Allow_Only_Experience()
-  {
-    // Arrange
-    var character = CreateCharacter();
-
-    // Act
-    character.ReceiveHuntRewards(100, 0);
-
-    // Assert
-    Assert.Equal(100, character.Experience);
-    Assert.Equal(0, character.Gold);
-    Assert.Equal(2, character.Level);
-  }
-
-  [Fact]
-  public void ReceiveHuntReward_Should_Allow_Multiple_Level_Ups()
-  {
-    // Arrange
-    var character = CreateCharacter();
-
-    // Act
-    character.ReceiveHuntRewards(600, 50);
-
-    // Assert
-    Assert.Equal(600, character.Experience);
-    Assert.Equal(50, character.Gold);
-    Assert.Equal(4, character.Level);
-  }
-
-  [Fact]
-  public void ReceiveHuntReward_Should_Throw_When_Gold_Is_Negative()
-  {
-    // Arrange
-    var character = CreateCharacter();
-
-    // Act & Assert
-    Assert.Throws<ArgumentOutOfRangeException>(() => character.ReceiveHuntRewards(100, -50));
-  }
-
   [Theory]
   [InlineData(0)]
   [InlineData(-1)]
@@ -242,7 +188,44 @@ public sealed class CharacterTests
     Assert.Equal(2, character.Level);
   }
 
+  [Fact]
+  public void ReceiveGold_Should_Increase_Gold()
+  {
+    // Arrange
+    var character = CreateCharacter();
 
+    // Act
+    character.ReceiveGold(50);
+
+    // Assert
+    Assert.Equal(50, character.Gold);
+  }
+
+  [Fact]
+  public void ReceiveGold_Should_Accumulate_Gold()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceiveGold(20);
+    character.ReceiveGold(30);
+
+    // Assert
+    Assert.Equal(50, character.Gold);
+  }
+
+  [Fact]
+  public void ReceiveGold_Should_Throw_When_Gold_Is_Negative()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act & Assert
+    Assert.Throws<ArgumentOutOfRangeException>(() =>
+        character.ReceiveGold(-1)
+    );
+  }
 
   public static TheoryData<long, long, int> ReceivedExperienceCases => new()
   {

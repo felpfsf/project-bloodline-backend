@@ -50,10 +50,8 @@ public sealed class CompleteHuntHandler(
 
     hunt.Complete(nowUtc);
 
-    character.ReceiveHuntRewards(
-      hunt.ExperienceReward,
-      hunt.GoldReward
-    );
+    character.ReceivedExperience(hunt.ExperienceReward);
+    character.ReceiveGold(hunt.GoldReward);
 
     try
     {

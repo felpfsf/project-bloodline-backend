@@ -125,17 +125,16 @@ public sealed class Character
     }
   }
 
-  public void ReceiveHuntRewards(long experience, long gold)
+  public void ReceiveGold(long gold)
   {
     if (gold < 0)
     {
       throw new ArgumentOutOfRangeException(
-          nameof(gold),
-          "Gold reward cannot be negative."
-        );
+        nameof(gold),
+        "Gold amount must be greater than or equal to zero."
+      );
     }
 
-    ReceivedExperience(experience);
     Gold += gold;
   }
 
