@@ -245,6 +245,97 @@ public sealed class CharacterTests
     Assert.Empty(character.DomainEvents);
   }
 
+  [Fact]
+  public void ReceiveExperience_Should_Raise_Multiple_CharacterLeveledUp_Events()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceiveExperience(600); // enough to level up multiple times
+
+    // Assert
+    // var events = character.DomainEvents.OfType<CharacterLevelUp>().ToList();
+
+    // Assert.Equal(3, events.Count);
+
+    // Assert.Equal(1, events[0].PreviousLevel);
+    // Assert.Equal(2, events[0].NewLevel);
+
+    // Assert.Equal(2, events[1].PreviousLevel);
+    // Assert.Equal(3, events[1].NewLevel);
+
+    // Assert.Equal(3, events[2].PreviousLevel);
+    // Assert.Equal(4, events[2].NewLevel);
+
+    Assert.Collection(
+      character.DomainEvents,
+      first =>
+      {
+        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(first);
+
+        Assert.Equal(1, leveledUpEvent.PreviousLevel);
+        Assert.Equal(2, leveledUpEvent.NewLevel);
+      },
+      second =>
+      {
+        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(second);
+
+        Assert.Equal(2, leveledUpEvent.PreviousLevel);
+        Assert.Equal(3, leveledUpEvent.NewLevel);
+      },
+      third =>
+      {
+        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(third);
+
+        Assert.Equal(3, leveledUpEvent.PreviousLevel);
+        Assert.Equal(4, leveledUpEvent.NewLevel);
+      }
+    )
+    ;
+  }
+
+  [Fact]
+  public void ReceiveExperience_Should_Accumulate_DomainEvents_Across_Multiple_Calls()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceiveExperience(100);
+    character.ReceiveExperience(200);
+    character.ReceiveExperience(300); // enough to trigger multiple level ups
+
+    // Assert
+    Assert.Collection(
+      character.DomainEvents,
+      first =>
+      {
+        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(first);
+
+        Assert.Equal(1, leveledUpEvent.PreviousLevel);
+        Assert.Equal(2, leveledUpEvent.NewLevel);
+        Assert.Equal(100L, leveledUpEvent.TotalExperience);
+      },
+      second =>
+      {
+        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(second);
+
+        Assert.Equal(2, leveledUpEvent.PreviousLevel);
+        Assert.Equal(3, leveledUpEvent.NewLevel);
+        Assert.Equal(300L, leveledUpEvent.TotalExperience);
+      },
+      third =>
+      {
+        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(third);
+
+        Assert.Equal(3, leveledUpEvent.PreviousLevel);
+        Assert.Equal(4, leveledUpEvent.NewLevel);
+        Assert.Equal(600L, leveledUpEvent.TotalExperience);
+      }
+    );
+  }
+
   public static TheoryData<long, long, int> ReceiveExperienceCases => new()
   {
     {50L, 50L, 1}, // bellow lvl 2
