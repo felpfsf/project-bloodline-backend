@@ -1,4 +1,5 @@
 using Bloodline.Domain.Characters;
+using Bloodline.Domain.Characters.Events;
 
 namespace Bloodline.Domain.Tests.Characters;
 
@@ -83,7 +84,7 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceivedExperience(50);
+    character.ReceiveExperience(50);
 
     // Assert
     Assert.Equal(50, character.Experience);
@@ -96,7 +97,7 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceivedExperience(100);
+    character.ReceiveExperience(100);
 
     // Assert
     Assert.Equal(100, character.Experience);
@@ -110,7 +111,7 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceivedExperience(50);
+    character.ReceiveExperience(50);
 
     // Assert
     Assert.Equal(50, character.Experience);
@@ -124,7 +125,7 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceivedExperience(600);
+    character.ReceiveExperience(600);
 
     // Assert
     Assert.Equal(600, character.Experience);
@@ -138,9 +139,9 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act
-    character.ReceivedExperience(50);
-    character.ReceivedExperience(30);
-    character.ReceivedExperience(20);
+    character.ReceiveExperience(50);
+    character.ReceiveExperience(30);
+    character.ReceiveExperience(20);
 
     // Assert
     Assert.Equal(100, character.Experience);
@@ -154,38 +155,22 @@ public sealed class CharacterTests
     var character = CreateCharacter();
 
     // Act & Assert
-    Assert.Throws<ArgumentOutOfRangeException>(() => character.ReceivedExperience(-100));
+    Assert.Throws<ArgumentOutOfRangeException>(() => character.ReceiveExperience(-100));
   }
 
   [Theory]
-  [MemberData(nameof(ReceivedExperienceCases))]
+  [MemberData(nameof(ReceiveExperienceCases))]
   public void Received_Experience_Should_Update_Experience_And_Level_Correctly(long gainedExperience, long expectedExperience, int expectedLevel)
   {
     // Arrange
     var character = CreateCharacter();
 
     // Act
-    character.ReceivedExperience(gainedExperience);
+    character.ReceiveExperience(gainedExperience);
 
     // Assert
     Assert.Equal(expectedExperience, character.Experience);
     Assert.Equal(expectedLevel, character.Level);
-  }
-
-  [Fact]
-  public void ReceivedExperience_Should_Accumulate_Across_Multiple_Calls()
-  {
-    // Arrange
-    var character = CreateCharacter();
-
-    // Act
-    character.ReceivedExperience(50);
-    character.ReceivedExperience(30);
-    character.ReceivedExperience(20);
-
-    // Assert
-    Assert.Equal(100, character.Experience);
-    Assert.Equal(2, character.Level);
   }
 
   [Fact]
@@ -227,7 +212,40 @@ public sealed class CharacterTests
     );
   }
 
-  public static TheoryData<long, long, int> ReceivedExperienceCases => new()
+  [Fact]
+  public void ReceiveExperience_Should_Raise_CharacterLeveledUp_When_Level_Increases()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceiveExperience(100);
+
+    // Assert
+    var domainEvent = Assert.Single(character.DomainEvents);
+
+    var leveledUpEvent = Assert.IsType<CharacterLevelUp>(domainEvent);
+
+    Assert.Equal(character.Id, leveledUpEvent.CharacterId);
+    Assert.Equal(1, leveledUpEvent.PreviousLevel);
+    Assert.Equal(2, leveledUpEvent.NewLevel);
+    Assert.Equal(100, leveledUpEvent.TotalExperience);
+  }
+
+  [Fact]
+  public void ReceiveExperience_Should_Not_Raise_CharacterLeveledUp_When_Level_Does_Not_Increase()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    // Act
+    character.ReceiveExperience(99);
+
+    // Assert
+    Assert.Empty(character.DomainEvents);
+  }
+
+  public static TheoryData<long, long, int> ReceiveExperienceCases => new()
   {
     {50L, 50L, 1}, // bellow lvl 2
     {99L, 99L, 1}, // lower border
@@ -243,7 +261,7 @@ public sealed class CharacterTests
       Guid.NewGuid(),
       "Damon Salvatore",
       Faction.Vampire,
-      DateTimeOffset.UtcNow
+      new DateTimeOffset(2026, 9, 26, 12, 0, 0, TimeSpan.Zero)
     );
   }
 }

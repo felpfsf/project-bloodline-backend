@@ -1,3 +1,6 @@
+using Bloodline.Domain.Characters.Events;
+using Bloodline.Domain.Common;
+
 namespace Bloodline.Domain.Characters;
 
 public sealed class Character
@@ -17,6 +20,10 @@ public sealed class Character
   public int Agility { get; private set; }
 
   public DateTimeOffset CreatedAtUtc { get; private set; }
+
+  public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+  private readonly List<IDomainEvent> _domainEvents = [];
+  private void RaiseDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
 
   private Character() { }
 
@@ -107,7 +114,7 @@ public sealed class Character
     Energy -= amount;
   }
 
-  public void ReceivedExperience(long experience)
+  public void ReceiveExperience(long experience)
   {
     if (experience < 0)
     {
@@ -121,7 +128,18 @@ public sealed class Character
 
     while (Experience >= CharacterProgression.ExperienceRequiredForNextLevel(Level + 1))
     {
+      var previousLevel = Level;
+
       Level++;
+
+      RaiseDomainEvent(
+        new CharacterLevelUp(
+          CharacterId: Id,
+          NewLevel: Level,
+          PreviousLevel: previousLevel,
+          TotalExperience: Experience
+        )
+      );
     }
   }
 
