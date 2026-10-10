@@ -336,6 +336,26 @@ public sealed class CharacterTests
     );
   }
 
+  [Fact]
+  public void ClearDomainEvents_Should_Remove_All_Pending_Events()
+  {
+    // Arrange
+    var character = CreateCharacter();
+
+    character.ReceiveExperience(600); // generate a domain event
+
+    Assert.Equal(3, character.DomainEvents.Count); // there should be 3 level up events
+
+    // Act
+    character.ClearDomainEvents();
+
+    // Assert
+    Assert.Empty(character.DomainEvents);
+
+    Assert.Equal(4, character.Level);
+    Assert.Equal(600L, character.Experience);
+  }
+
   public static TheoryData<long, long, int> ReceiveExperienceCases => new()
   {
     {50L, 50L, 1}, // bellow lvl 2

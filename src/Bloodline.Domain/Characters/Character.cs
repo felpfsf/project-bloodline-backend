@@ -156,6 +156,11 @@ public sealed class Character
     Gold += gold;
   }
 
+  public void ClearDomainEvents()
+  {
+    _domainEvents.Clear();
+  }
+
   private static string NormalizeName(string name)
   {
     return name.Trim().ToUpperInvariant();
