@@ -13,6 +13,7 @@ using Bloodline.Infrastructure.Persistence;
 using Bloodline.Api.Features.Characters;
 using Bloodline.Api.Features.Hunts;
 using Bloodline.Api.Common.Http;
+using Bloodline.Infrastructure.Events;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,10 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddApplication();
+
+builder.Services.AddDomainEventDispatching();
 
 builder.Services
     .AddHealthChecks()
