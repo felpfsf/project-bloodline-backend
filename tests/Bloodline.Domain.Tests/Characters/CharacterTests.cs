@@ -224,7 +224,7 @@ public sealed class CharacterTests
     // Assert
     var domainEvent = Assert.Single(character.DomainEvents);
 
-    var leveledUpEvent = Assert.IsType<CharacterLevelUp>(domainEvent);
+    var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(domainEvent);
 
     Assert.Equal(character.Id, leveledUpEvent.CharacterId);
     Assert.Equal(1, leveledUpEvent.PreviousLevel);
@@ -255,7 +255,7 @@ public sealed class CharacterTests
     character.ReceiveExperience(600); // enough to level up multiple times
 
     // Assert
-    // var events = character.DomainEvents.OfType<CharacterLevelUp>().ToList();
+    // var events = character.DomainEvents.OfType<CharacterLeveledUp>().ToList();
 
     // Assert.Equal(3, events.Count);
 
@@ -272,21 +272,21 @@ public sealed class CharacterTests
       character.DomainEvents,
       first =>
       {
-        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(first);
+        var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(first);
 
         Assert.Equal(1, leveledUpEvent.PreviousLevel);
         Assert.Equal(2, leveledUpEvent.NewLevel);
       },
       second =>
       {
-        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(second);
+        var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(second);
 
         Assert.Equal(2, leveledUpEvent.PreviousLevel);
         Assert.Equal(3, leveledUpEvent.NewLevel);
       },
       third =>
       {
-        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(third);
+        var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(third);
 
         Assert.Equal(3, leveledUpEvent.PreviousLevel);
         Assert.Equal(4, leveledUpEvent.NewLevel);
@@ -311,7 +311,7 @@ public sealed class CharacterTests
       character.DomainEvents,
       first =>
       {
-        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(first);
+        var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(first);
 
         Assert.Equal(1, leveledUpEvent.PreviousLevel);
         Assert.Equal(2, leveledUpEvent.NewLevel);
@@ -319,7 +319,7 @@ public sealed class CharacterTests
       },
       second =>
       {
-        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(second);
+        var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(second);
 
         Assert.Equal(2, leveledUpEvent.PreviousLevel);
         Assert.Equal(3, leveledUpEvent.NewLevel);
@@ -327,7 +327,7 @@ public sealed class CharacterTests
       },
       third =>
       {
-        var leveledUpEvent = Assert.IsType<CharacterLevelUp>(third);
+        var leveledUpEvent = Assert.IsType<CharacterLeveledUp>(third);
 
         Assert.Equal(3, leveledUpEvent.PreviousLevel);
         Assert.Equal(4, leveledUpEvent.NewLevel);

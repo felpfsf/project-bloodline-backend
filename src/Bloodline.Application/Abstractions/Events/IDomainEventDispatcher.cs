@@ -4,7 +4,7 @@ namespace Bloodline.Application.Abstractions.Events;
 
 public interface IDomainEventDispatcher
 {
-  Task DispatchAsync<TDomainEvent>(
+  Task DispatchAsync(
     IDomainEvent domainEvent,
     CancellationToken cancellationToken = default
   );

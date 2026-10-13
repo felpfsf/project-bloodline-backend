@@ -35,7 +35,7 @@ public static class DependencyInjection
     services.AddScoped<IValidator<LoginCommand>, LoginUserCommandValidator>();
     services.AddScoped<IValidator<CreateCharacterCommand>, CreateCharacterCommandValidator>();
 
-    services.AddScoped<IDomainEventHandler<CharacterLevelUp>, LogCharacterLevelUpHandler>();
+    services.AddScoped<IDomainEventHandler<CharacterLeveledUp>, LogCharacterLeveledUpHandler>();
 
     return services;
   }
