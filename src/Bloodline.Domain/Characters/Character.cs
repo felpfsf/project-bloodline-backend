@@ -133,7 +133,7 @@ public sealed class Character
       Level++;
 
       RaiseDomainEvent(
-        new CharacterLevelUp(
+        new CharacterLeveledUp(
           CharacterId: Id,
           NewLevel: Level,
           PreviousLevel: previousLevel,

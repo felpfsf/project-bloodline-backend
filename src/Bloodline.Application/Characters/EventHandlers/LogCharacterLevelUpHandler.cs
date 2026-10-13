@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Bloodline.Application.Characters.EventHandlers;
 
-public class LogCharacterLevelUpHandler(ILogger<LogCharacterLevelUpHandler> logger) : IDomainEventHandler<CharacterLevelUp>
+public class LogCharacterLeveledUpHandler(ILogger<LogCharacterLeveledUpHandler> logger) : IDomainEventHandler<CharacterLeveledUp>
 {
-  private readonly ILogger<LogCharacterLevelUpHandler> _logger = logger;
+  private readonly ILogger<LogCharacterLeveledUpHandler> _logger = logger;
 
   public Task HandleAsync(
-    CharacterLevelUp domainEvent,
+    CharacterLeveledUp domainEvent,
     CancellationToken cancellationToken = default
   )
   {

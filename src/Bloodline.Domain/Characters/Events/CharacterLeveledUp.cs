@@ -2,7 +2,7 @@ using Bloodline.Domain.Common;
 
 namespace Bloodline.Domain.Characters.Events;
 
-public sealed record CharacterLevelUp(
+public sealed record CharacterLeveledUp(
   Guid CharacterId,
   int NewLevel,
   int PreviousLevel,
