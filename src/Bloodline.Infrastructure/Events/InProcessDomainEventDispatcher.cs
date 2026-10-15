@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using Bloodline.Application.Abstractions.Events;
 using Bloodline.Domain.Common;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,10 +31,21 @@ public sealed class InProcessDomainEventDispatcher(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var result = handleMethod.Invoke(
-                handler,
-                new object?[] { domainEvent, cancellationToken }
-            );
+            object? result;
+
+            try
+            {
+                result = handleMethod.Invoke(
+                    handler,
+                    [domainEvent, cancellationToken]
+                );
+            }
+            catch (TargetInvocationException ex) 
+                when (ex.InnerException is not null)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw;
+            }
 
             if (result is not Task task)
             {

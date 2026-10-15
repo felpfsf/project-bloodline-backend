@@ -143,6 +143,62 @@ public class InProcessDomainEventDispatcherTests
     );
   }
 
+  [Fact]
+  public async Task DispatchAsync_Should_Propagate_Original_Exception_When_Handler_Throws_Synchronously()
+  {
+    // Arrange
+    var services = new ServiceCollection();
+
+    services.AddScoped<IDomainEventHandler<CharacterLeveledUp>>(
+        _ => new SynchronousFailingLevelUpHandler()
+    );
+
+    services.AddScoped<
+        IDomainEventDispatcher,
+        InProcessDomainEventDispatcher
+    >();
+
+    using var provider = services.BuildServiceProvider(
+        validateScopes: true
+    );
+
+    using var scope = provider.CreateScope();
+
+    var dispatcher = scope.ServiceProvider
+        .GetRequiredService<IDomainEventDispatcher>();
+
+    var domainEvent = new CharacterLeveledUp(
+        Guid.NewGuid(),
+        1,
+        2,
+        100L
+    );
+
+    // Act
+    var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        () => dispatcher.DispatchAsync(domainEvent)
+    );
+
+    // Assert
+    Assert.Equal(
+        "Simulated synchronous handler failure",
+        exception.Message
+    );
+  }
+
+  private sealed class SynchronousFailingLevelUpHandler : IDomainEventHandler<CharacterLeveledUp>
+  {
+    public Task HandleAsync(
+      CharacterLeveledUp domainEvent,
+      CancellationToken cancellationToken = default
+    )
+    {
+      throw new InvalidOperationException(
+        "Simulated synchronous handler failure"
+      );
+    }
+  }
+
   private static void AddTrackingHandler(
     IServiceCollection services,
     string name,
