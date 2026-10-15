@@ -1,8 +1,10 @@
+using Bloodline.Application.Abstractions.Events;
 using Bloodline.Application.Characters.Abstractions;
 using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Common.Time;
 using Bloodline.Application.Hunts.Abstractions;
 using Bloodline.Domain.Hunts;
+using Microsoft.Extensions.Logging;
 
 namespace Bloodline.Application.Hunts.CompleteHunt;
 
@@ -10,13 +12,17 @@ public sealed class CompleteHuntHandler(
   ICharacterRepository characterRepository,
   IHuntRepository huntRepository,
   IUnitOfWork unitOfWork,
-  IClock clock
+  IClock clock,
+  IDomainEventDispatcher eventDispatcher,
+  ILogger<CompleteHuntHandler> logger
 )
 {
   private readonly ICharacterRepository _characterRepository = characterRepository;
   private readonly IHuntRepository _huntRepository = huntRepository;
   private readonly IUnitOfWork _unitOfWork = unitOfWork;
   private readonly IClock _clock = clock;
+  private readonly IDomainEventDispatcher _eventDispatcher = eventDispatcher;
+  private readonly ILogger<CompleteHuntHandler> _logger = logger;
 
   public async Task<CompleteHuntResult> HandleAsync(
     CompleteHuntCommand command,
@@ -74,6 +80,36 @@ public sealed class CompleteHuntHandler(
         return BuildSuccessResult(persistedHunt);
       }
       throw;
+    }
+
+    var pendingEvents = character.DomainEvents.ToArray();
+
+    try
+    {
+      foreach (var domainEvent in pendingEvents)
+      {
+        try
+        {
+          await _eventDispatcher.DispatchAsync(
+            domainEvent,
+            CancellationToken.None
+          );
+        }
+        catch (Exception exception)
+        {
+          _logger.LogError(
+            exception,
+            "Failed to dispatch {DomainEventType} for Character {CharacterId}",
+            domainEvent.GetType().Name,
+            character.Id
+          );
+          throw;
+        }
+      }
+    }
+    finally
+    {
+      character.ClearDomainEvents();
     }
 
     return BuildSuccessResult(hunt);
