@@ -3,6 +3,7 @@ using Bloodline.Application.Characters.Abstractions;
 using Bloodline.Application.Common.Persistence;
 using Bloodline.Application.Common.Time;
 using Bloodline.Application.Hunts.Abstractions;
+using Bloodline.Domain.Common;
 using Bloodline.Domain.Hunts;
 using Microsoft.Extensions.Logging;
 
@@ -103,7 +104,6 @@ public sealed class CompleteHuntHandler(
             domainEvent.GetType().Name,
             character.Id
           );
-          throw;
         }
       }
     }

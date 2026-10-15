@@ -169,30 +169,73 @@ public sealed class CompleteHuntHandlerTests
   }
 
   [Fact]
-  public async Task HandleAsync_Should_Propagate_Dispatch_Failure_And_Clear_Pending_Events()
+  public async Task HandleAsync_Should_Return_Success_When_Dispatch_Fails_After_Saving()
   {
+    // Arrange
     var userId = Guid.NewGuid();
     var startsAtUtc = new DateTimeOffset(2026, 7, 7, 20, 0, 0, TimeSpan.Zero);
     var character = CreateCharacter(userId);
     character.ReceiveExperience(90);
     var hunt = CreateHunt(character, startsAtUtc);
-    var characterRepository = new FakeCharacterRepository { CharacterToReturn = character };
-    var huntRepository = new FakeHuntRepository { HuntToReturn = hunt };
-    var unitOfWork = new FakeUnitOfWork();
-    var clock = new FakeClock { UtcNow = startsAtUtc.AddSeconds(60) };
-    var failure = new InvalidOperationException("Event handler failed.");
-    var dispatcher = new RecordingDomainEventDispatcher(_ => throw failure);
-    var handler = CreateHandler(characterRepository, huntRepository, unitOfWork, clock, dispatcher);
 
-    var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-      () => CompleteHuntAsync(handler, userId, hunt.Id)
+    var characterRepository = new FakeCharacterRepository
+    {
+      CharacterToReturn = character
+    };
+
+    var huntRepository = new FakeHuntRepository
+    {
+      HuntToReturn = hunt
+    };
+
+    var unitOfWork = new FakeUnitOfWork();
+
+    var clock = new FakeClock
+    {
+      UtcNow = startsAtUtc.AddSeconds(60)
+    };
+
+    var dispatchAttempted = false;
+
+    var dispatcher = new RecordingDomainEventDispatcher(_ =>
+    {
+      dispatchAttempted = true;
+
+      throw new InvalidOperationException("Event handler failed.");
+    });
+
+    var handler = CreateHandler(
+      characterRepository,
+      huntRepository,
+      unitOfWork,
+      clock,
+      dispatcher
     );
 
-    Assert.Same(failure, exception);
+    // Act
+
+    var result = await CompleteHuntAsync(
+      handler,
+      userId,
+      hunt.Id
+    );
+
+    // Assert
+
+    Assert.True(result.IsSuccess);
+
+    Assert.True(dispatchAttempted);
+
     Assert.Equal(1, unitOfWork.SaveChangesCallCount);
+
     Assert.Equal(HuntStatus.Completed, hunt.Status);
+
     Assert.Equal(115, character.Experience);
+
     Assert.Equal(15, character.Gold);
+
+    Assert.Equal(2, character.Level);
+
     Assert.Empty(character.DomainEvents);
   }
 
@@ -374,6 +417,37 @@ public sealed class CompleteHuntHandlerTests
     {
       onDispatch?.Invoke(domainEvent);
       DispatchedEvents.Add(domainEvent);
+      return Task.CompletedTask;
+    }
+  }
+
+  private sealed class TrackingUnitOfWork(List<string> executionOrder) : IUnitOfWork
+  {
+    private readonly List<string> _executionOrder = executionOrder;
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+    {
+      _executionOrder.Add(nameof(SaveChangesAsync));
+
+      return Task.FromResult(1);
+    }
+  }
+
+  private sealed class TrackingDomainEventDispatcher(
+    List<string> executionOrder
+    ) : IDomainEventDispatcher
+  {
+    private readonly List<string> _executionOrder = executionOrder;
+
+    public List<IDomainEvent> ReceivedEvents { get; } = [];
+
+    public Task DispatchAsync(
+      IDomainEvent domainEvent,
+      CancellationToken cancellationToken = default
+    )
+    {
+      _executionOrder.Add("Dispatch");
+
       return Task.CompletedTask;
     }
   }
